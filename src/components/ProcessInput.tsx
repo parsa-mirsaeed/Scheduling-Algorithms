@@ -70,6 +70,7 @@ const ProcessInput: React.FC<ProcessInputProps> = ({ addProcess }) => {
           <input
             type="text"
             id="arrivalTime"
+            className="form-control"
             value={arrivalTime}
             onChange={handleArrivalTimeChange}
             placeholder="0"
@@ -82,6 +83,7 @@ const ProcessInput: React.FC<ProcessInputProps> = ({ addProcess }) => {
           <input
             type="text"
             id="burstTime"
+            className="form-control"
             value={burstTime}
             onChange={handleBurstTimeChange}
             placeholder="1"

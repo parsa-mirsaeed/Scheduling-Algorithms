@@ -68,8 +68,11 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
     // Draw time markers
     ctx.textAlign = 'center';
     
-    // Draw all integer time points with minor styling
+    // Draw all integer time points with minor styling, but skip transition points
     for (let t = firstStartTime; t <= lastEndTime; t++) {
+      // Skip if this is a transition point
+      if (sortedTimePoints.includes(t)) continue;
+      
       const x = 40 + (t - firstStartTime) * timeUnitWidth;
       ctx.beginPath();
       
@@ -101,7 +104,6 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
       // Larger, bold font for transition points
       ctx.font = 'bold 12px Arial';
       ctx.fillStyle = '#000000';
-      // Draw with a slight offset to make it stand out
       ctx.fillText(t.toString(), x, yStart + barHeight + 45);
       
       // Add decorative marker for better visibility
