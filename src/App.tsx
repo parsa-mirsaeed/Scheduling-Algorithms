@@ -109,7 +109,7 @@ function App() {
             <h2>Process Execution Details</h2>
             <ExecutionHistory 
               processes={simulationResults.processes} 
-              ganttChart={simulationResults.ganttChart}
+              ganttChart={simulationResults.rawGanttChart}
               algorithm={selectedAlgorithm}
               timeQuantum={selectedAlgorithm === 'RR' ? timeQuantum : undefined}
             />

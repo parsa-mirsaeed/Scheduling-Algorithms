@@ -20,7 +20,8 @@ export interface GanttItem {
 
 // Define SimulationResult interface
 export interface SimulationResult {
-  ganttChart: GanttItem[];
+  ganttChart: GanttItem[]; // Consolidated for visual chart
+  rawGanttChart: GanttItem[]; // Unconsolidated for execution history
   processes: Process[];
   averageTurnaroundTime: number;
   averageWaitingTime: number;
@@ -37,6 +38,7 @@ export function fifoScheduling(processes: Process[]): SimulationResult {
   if (processes.length === 0) {
     return {
       ganttChart: [],
+      rawGanttChart: [],
       processes: [],
       averageTurnaroundTime: 0,
       averageWaitingTime: 0,
@@ -82,11 +84,12 @@ export function fifoScheduling(processes: Process[]): SimulationResult {
     });
   }
   
-  // Calculate averages using the helper function
+  // For non-preemptive, raw is same as consolidated
   const metrics = calculateMetrics(processesClone);
   
   return {
-    ganttChart,
+    ganttChart, // Same as rawGanttChart for FIFO
+    rawGanttChart: ganttChart, 
     processes: processesClone,
     ...metrics
   };
@@ -97,6 +100,7 @@ export function sjfScheduling(processes: Process[]): SimulationResult {
   if (processes.length === 0) {
     return {
       ganttChart: [],
+      rawGanttChart: [],
       processes: [],
       averageTurnaroundTime: 0,
       averageWaitingTime: 0,
@@ -171,11 +175,12 @@ export function sjfScheduling(processes: Process[]): SimulationResult {
     completed.push(shortestJob);
   }
   
-  // Calculate averages
+  // For non-preemptive, raw is same as consolidated
   const metrics = calculateMetrics(processesClone);
   
   return {
-    ganttChart,
+    ganttChart, // Same as rawGanttChart for SJF
+    rawGanttChart: ganttChart, 
     processes: processesClone,
     ...metrics
   };
@@ -186,6 +191,7 @@ export function srtScheduling(processes: Process[]): SimulationResult {
   if (processes.length === 0) {
     return {
       ganttChart: [],
+      rawGanttChart: [],
       processes: [],
       averageTurnaroundTime: 0,
       averageWaitingTime: 0,
@@ -202,6 +208,7 @@ export function srtScheduling(processes: Process[]): SimulationResult {
   });
   
   const ganttChart: GanttItem[] = [];
+  const rawGanttChart: GanttItem[] = []; // Store raw steps here
   let currentTime = Math.min(...processesClone.map(p => p.arrivalTime));
   let completedCount = 0;
   let currentProcess: Process | null = null;
@@ -255,6 +262,13 @@ export function srtScheduling(processes: Process[]): SimulationResult {
       nextArrivalTime - currentTime
     );
     
+    // Add raw step to rawGanttChart
+    rawGanttChart.push({
+      processId: currentProcess.id,
+      startTime: currentTime,
+      endTime: currentTime + executeTime
+    });
+    
     // Only add to Gantt chart if there's a process switch
     if (lastProcessId !== currentProcess.id) {
       if (ganttChart.length > 0 && ganttChart[ganttChart.length - 1].processId === currentProcess.id) {
@@ -290,11 +304,12 @@ export function srtScheduling(processes: Process[]): SimulationResult {
     }
   }
   
-  // Consolidate consecutive Gantt chart entries for the same process
+  // Consolidate consecutive Gantt chart entries for the visual chart
   const consolidatedGantt: GanttItem[] = [];
-  for (const item of ganttChart) {
+  for (const item of rawGanttChart) { // Consolidate from raw chart
     if (consolidatedGantt.length === 0 || 
-        consolidatedGantt[consolidatedGantt.length - 1].processId !== item.processId) {
+        consolidatedGantt[consolidatedGantt.length - 1].processId !== item.processId ||
+        consolidatedGantt[consolidatedGantt.length - 1].endTime !== item.startTime) { // Also check for time gap
       consolidatedGantt.push({...item});
     } else {
       consolidatedGantt[consolidatedGantt.length - 1].endTime = item.endTime;
@@ -305,7 +320,8 @@ export function srtScheduling(processes: Process[]): SimulationResult {
   const metrics = calculateMetrics(processesClone);
   
   return {
-    ganttChart: consolidatedGantt,
+    ganttChart: consolidatedGantt, // Use consolidated for visual chart
+    rawGanttChart: rawGanttChart, // Use raw for execution history
     processes: processesClone,
     ...metrics
   };
@@ -316,6 +332,7 @@ export function rrScheduling(processes: Process[], timeQuantum: number): Simulat
   if (processes.length === 0 || timeQuantum <= 0) {
     return {
       ganttChart: [],
+      rawGanttChart: [],
       processes: [],
       averageTurnaroundTime: 0,
       averageWaitingTime: 0,
@@ -332,6 +349,7 @@ export function rrScheduling(processes: Process[], timeQuantum: number): Simulat
   });
   
   const ganttChart: GanttItem[] = [];
+  const rawGanttChart: GanttItem[] = []; // Store raw steps here
   let currentTime = Math.min(...processesClone.map(p => p.arrivalTime));
   let completedCount = 0;
   
@@ -375,6 +393,13 @@ export function rrScheduling(processes: Process[], timeQuantum: number): Simulat
     // Determine execution time (minimum of time quantum and remaining time)
     const executeTime = Math.min(timeQuantum, currentProcess.remainingTime!);
     
+    // Add raw step to rawGanttChart
+    rawGanttChart.push({
+      processId: currentProcess.id,
+      startTime: currentTime,
+      endTime: currentTime + executeTime
+    });
+    
     // Only add to Gantt chart if there's a process switch
     if (lastProcessId !== currentProcess.id) {
       ganttChart.push({
@@ -414,11 +439,12 @@ export function rrScheduling(processes: Process[], timeQuantum: number): Simulat
     }
   }
   
-  // Consolidate consecutive Gantt chart entries for the same process
+  // Consolidate consecutive Gantt chart entries for the visual chart
   const consolidatedGantt: GanttItem[] = [];
-  for (const item of ganttChart) {
+  for (const item of rawGanttChart) { // Consolidate from raw chart
     if (consolidatedGantt.length === 0 || 
-        consolidatedGantt[consolidatedGantt.length - 1].processId !== item.processId) {
+        consolidatedGantt[consolidatedGantt.length - 1].processId !== item.processId ||
+        consolidatedGantt[consolidatedGantt.length - 1].endTime !== item.startTime) { // Also check for time gap
       consolidatedGantt.push({...item});
     } else {
       consolidatedGantt[consolidatedGantt.length - 1].endTime = item.endTime;
@@ -429,7 +455,8 @@ export function rrScheduling(processes: Process[], timeQuantum: number): Simulat
   const metrics = calculateMetrics(processesClone);
   
   return {
-    ganttChart: consolidatedGantt,
+    ganttChart: consolidatedGantt, // Use consolidated for visual chart
+    rawGanttChart: rawGanttChart, // Use raw for execution history
     processes: processesClone,
     ...metrics
   };
