@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { InlineMath, BlockMath } from 'react-katex'; // Use react-katex
 import 'katex/dist/katex.min.css'; // Keep KaTeX CSS
 import { Process } from '../logic/scheduler'; // Import Process type
@@ -27,21 +27,41 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const totalResponseTime = processes.reduce((sum, p) => sum + (p.responseTime ?? 0), 0);
   const numProcesses = processes.length > 0 ? processes.length : 1; // Avoid division by zero
 
-  // LaTeX formula strings (without $ delimiters for react-katex)
-  const turnaroundFormula = `\\frac{1}{n} \\sum_{i=1}^{n} TAT_i`;
-  const waitingFormula = `\\frac{1}{n} \\sum_{i=1}^{n} WT_i`;
-  const responseFormula = `\\frac{1}{n} \\sum_{i=1}^{n} RT_i`;
+  // Generate expanded sum strings for explanation
+  const turnaroundSumStr = processes.map(p => `TAT_{P${p.id}}`).join('+');
+  const waitingSumStr = processes.map(p => `WT_{P${p.id}}`).join('+');
+  const responseSumStr = processes.map(p => `RT_{P${p.id}}`).join('+');
 
-  const turnaroundCalculation = `\\frac{\\sum TAT_i}{n} = \\frac{${formatNumber(totalTurnaroundTime)}}{${numProcesses}}`;
-  const waitingCalculation = `\\frac{\\sum WT_i}{n} = \\frac{${formatNumber(totalWaitingTime)}}{${numProcesses}}`;
-  const responseCalculation = `\\frac{\\sum RT_i}{n} = \\frac{${formatNumber(totalResponseTime)}}{${numProcesses}}`;
+  // LaTeX formula strings
+  const turnaroundFormula = `\\text{Avg TAT} = \\frac{\\sum_{i=1}^{n} TAT_i}{n}`;
+  const waitingFormula = `\\text{Avg WT} = \\frac{\\sum_{i=1}^{n} WT_i}{n}`;
+  const responseFormula = `\\text{Avg RT} = \\frac{\\sum_{i=1}^{n} RT_i}{n}`;
+
+  // LaTeX calculation strings with expanded sums
+  const turnaroundCalculation = `\\frac{${turnaroundSumStr}}{${numProcesses}} = \\frac{${formatNumber(totalTurnaroundTime)}}{${numProcesses}}`;
+  const waitingCalculation = `\\frac{${waitingSumStr}}{${numProcesses}} = \\frac{${formatNumber(totalWaitingTime)}}{${numProcesses}}`;
+  const responseCalculation = `\\frac{${responseSumStr}}{${numProcesses}} = \\frac{${formatNumber(totalResponseTime)}}{${numProcesses}}`;
+
+  // Add debug logging to help find the parse error
+  useEffect(() => {
+    console.log('DEBUG LaTeX - Formula strings:');
+    console.log('turnaroundFormula:', turnaroundFormula);
+    console.log('turnaroundCalculation:', turnaroundCalculation);
+    console.log('turnaroundSumStr:', turnaroundSumStr);
+  }, [turnaroundFormula, turnaroundCalculation, turnaroundSumStr]);
 
   return (
     <div className="results-display">
+      <div className="metrics-definitions">
+        <p><strong>TAT:</strong> Turnaround Time (Completion Time - Arrival Time)</p>
+        <p><strong>WT:</strong> Waiting Time (Turnaround Time - Burst Time)</p>
+        <p><strong>RT:</strong> Response Time (Start Time - Arrival Time)</p>
+        <p><strong>n:</strong> Number of processes</p>
+      </div>
       <div className="metrics">
         {/* Average Turnaround Time */}
         <div className="metric">
-          <h3>Average Turnaround Time</h3>
+          <h3>Average Turnaround Time (Avg TAT)</h3>
           <div className="metric-formula">
             {/* Use BlockMath for display formulas */}
             <BlockMath math={turnaroundFormula} />
@@ -52,13 +72,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <span>{` = ${formatNumber(averageTurnaroundTime)}`}</span>
           </div>
           <p className="metric-description">
-            Time from process arrival to completion
+            Average time from process arrival to completion.
           </p>
         </div>
 
         {/* Average Waiting Time */}
         <div className="metric">
-          <h3>Average Waiting Time</h3>
+          <h3>Average Waiting Time (Avg WT)</h3>
           <div className="metric-formula">
             <BlockMath math={waitingFormula} />
           </div>
@@ -67,13 +87,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <span>{` = ${formatNumber(averageWaitingTime)}`}</span>
           </div>
           <p className="metric-description">
-            Time spent waiting in the ready queue
+            Average time a process spends waiting in the ready queue.
           </p>
         </div>
 
         {/* Average Response Time */}
         <div className="metric">
-          <h3>Average Response Time</h3>
+          <h3>Average Response Time (Avg RT)</h3>
           <div className="metric-formula">
             <BlockMath math={responseFormula} />
           </div>
@@ -82,7 +102,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <span>{` = ${formatNumber(averageResponseTime)}`}</span>
           </div>
           <p className="metric-description">
-            Time from arrival until first execution
+            Average time from process arrival until it first gets CPU time.
           </p>
         </div>
       </div>
