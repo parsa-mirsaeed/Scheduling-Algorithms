@@ -6,6 +6,7 @@ import Controls from './components/Controls'
 import GanttChart from './components/GanttChart'
 import ResultsDisplay from './components/ResultsDisplay'
 import DetailedProcessInfo from './components/DetailedProcessInfo'
+import ExecutionHistory from './components/ExecutionHistory'
 import { Process, SimulationResult, fifoScheduling, sjfScheduling, srtScheduling, rrScheduling } from './logic/scheduler'
 
 type Algorithm = 'FIFO' | 'SJF' | 'SRT' | 'RR'
@@ -102,8 +103,18 @@ function App() {
             <GanttChart data={simulationResults.ganttChart} />
           </div>
           
+          <div className="execution-history-section">
+            <h2>Process Execution Details</h2>
+            <ExecutionHistory 
+              processes={simulationResults.processes} 
+              ganttChart={simulationResults.ganttChart}
+              algorithm={selectedAlgorithm}
+              timeQuantum={selectedAlgorithm === 'RR' ? timeQuantum : undefined}
+            />
+          </div>
+          
           <div className="detailed-results-section">
-            <h2>Detailed Process Information</h2>
+            <h2>Process Metrics</h2>
             <DetailedProcessInfo processes={simulationResults.processes} />
           </div>
           
