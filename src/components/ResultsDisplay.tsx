@@ -27,9 +27,22 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const totalResponseTime = processes.reduce((sum, p) => sum + (p.responseTime ?? 0), 0);
   const numProcesses = processes.length > 0 ? processes.length : 1; // Avoid division by zero
 
+  // Generate individual WT calculation strings
+  const individualWtStrings = processes.map(p => {
+    const tat = p.turnaroundTime ?? 0;
+    const bt = p.burstTime;
+    const wt = p.waitingTime ?? 0;
+    // Ensure values are formatted correctly for LaTeX
+    const tatStr = formatNumber(tat);
+    const btStr = bt; // Burst time is usually an integer
+    const wtStr = formatNumber(wt);
+    return `WT_{P${p.id}} = TAT_{P${p.id}} - BT_{P${p.id}} = ${tatStr} - ${btStr} = ${wtStr}`;
+  });
+
   // Generate expanded sum strings for explanation
   const turnaroundSumStr = processes.map(p => `TAT_{P${p.id}}`).join('+');
-  const waitingSumStr = processes.map(p => `WT_{P${p.id}}`).join('+');
+  // Use actual calculated WT values in the sum
+  const waitingSumValuesStr = processes.map(p => formatNumber(p.waitingTime ?? 0)).join('+');
   const responseSumStr = processes.map(p => `RT_{P${p.id}}`).join('+');
 
   // LaTeX formula strings
@@ -37,9 +50,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const waitingFormula = `\\text{Avg WT} = \\frac{\\sum_{i=1}^{n} WT_i}{n}`;
   const responseFormula = `\\text{Avg RT} = \\frac{\\sum_{i=1}^{n} RT_i}{n}`;
 
+  // Individual WT formula explanation
+  const individualWtFormula = `WT_i = TAT_i - BT_i`;
+
   // LaTeX calculation strings with expanded sums
   const turnaroundCalculation = `\\frac{${turnaroundSumStr}}{${numProcesses}} = \\frac{${formatNumber(totalTurnaroundTime)}}{${numProcesses}}`;
-  const waitingCalculation = `\\frac{${waitingSumStr}}{${numProcesses}} = \\frac{${formatNumber(totalWaitingTime)}}{${numProcesses}}`;
+  // Updated waiting calculation to show individual values sum
+  const waitingCalculation = `\\frac{${waitingSumValuesStr}}{${numProcesses}} = \\frac{${formatNumber(totalWaitingTime)}}{${numProcesses}}`;
   const responseCalculation = `\\frac{${responseSumStr}}{${numProcesses}} = \\frac{${formatNumber(totalResponseTime)}}{${numProcesses}}`;
 
   // Add debug logging to help find the parse error
@@ -79,10 +96,26 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         {/* Average Waiting Time */}
         <div className="metric">
           <h3>Average Waiting Time (Avg WT)</h3>
+          {/* Display individual WT calculations */}
+          <div className="metric-step-by-step">
+            <h4>Individual Waiting Time Calculations:</h4>
+            <p>
+              <InlineMath math={individualWtFormula} />
+            </p>
+            {individualWtStrings.map((calc, index) => (
+              <p key={index}> {/* Use BlockMath for each calculation step */}
+                <BlockMath math={calc} />
+              </p>
+            ))}
+          </div>
+          {/* Display Average WT formula */}
           <div className="metric-formula">
+            <h4>Average Waiting Time Formula:</h4>
             <BlockMath math={waitingFormula} />
           </div>
+          {/* Display Average WT calculation */}
           <div className="metric-calculation">
+            <h4>Average Waiting Time Calculation:</h4>
             <InlineMath math={waitingCalculation} />
             <span>{` = ${formatNumber(averageWaitingTime)}`}</span>
           </div>

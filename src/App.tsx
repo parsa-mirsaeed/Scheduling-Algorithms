@@ -7,9 +7,11 @@ import GanttChart from './components/GanttChart'
 import ResultsDisplay from './components/ResultsDisplay'
 import DetailedProcessInfo from './components/DetailedProcessInfo'
 import ExecutionHistory from './components/ExecutionHistory'
+import MetricsExplanation from './components/MetricsExplanation'
 import { Process, SimulationResult, fifoScheduling, sjfScheduling, srtScheduling, rrScheduling } from './logic/scheduler'
 
 type Algorithm = 'FIFO' | 'SJF' | 'SRT' | 'RR'
+type AppView = 'setup' | 'simulation' | 'explanation'
 
 function App() {
   // State for processes
@@ -26,6 +28,9 @@ function App() {
   
   // State for simulation status
   const [status, setStatus] = useState<'idle' | 'running' | 'finished'>('idle')
+
+  // State for the current view
+  const [currentView, setCurrentView] = useState<AppView>('setup')
 
   // Function to add a process to the list
   const addProcess = (process: Process) => {
@@ -60,74 +65,157 @@ function App() {
     
     setSimulationResults(result)
     setStatus('finished')
+    setCurrentView('simulation')
   }
 
   // Function to reset simulation
   const resetSimulation = () => {
     setStatus('idle')
     setSimulationResults(null)
+    setCurrentView('setup')
   }
 
   return (
     <div className="app-container">
-      <h1>CPU Scheduling Algorithm Visualizer</h1>
-      
-      <div className="setup-section">
-        <div className="input-section">
-          <h2>Add Processes</h2>
-          <ProcessInput addProcess={addProcess} />
-        </div>
-
-        <div className="controls-section">
-          <h2>Controls</h2>
-          <Controls
-            selectedAlgorithm={selectedAlgorithm}
-            setSelectedAlgorithm={setSelectedAlgorithm}
-            timeQuantum={timeQuantum}
-            setTimeQuantum={setTimeQuantum}
-            startSimulation={startSimulation}
-            resetSimulation={resetSimulation}
-          />
-        </div>
+      <header className="app-header">
+        <h1>CPU Scheduling Algorithm Visualizer</h1>
         
-        {processes.length > 0 && (
-          <div className="process-list-section">
-            <h2>Process List</h2>
-            <ProcessListDisplay processes={processes} />
-          </div>
-        )}
-      </div>
+        {/* Navigation Tabs */}
+        <nav className="app-nav">
+          <button 
+            className={`nav-tab ${currentView === 'setup' ? 'active' : ''}`} 
+            onClick={() => setCurrentView('setup')}
+          >
+            Setup
+          </button>
+          <button 
+            className={`nav-tab ${currentView === 'simulation' ? 'active' : ''}`} 
+            onClick={() => setCurrentView('simulation')}
+            disabled={status !== 'finished'}
+          >
+            Simulation Results
+          </button>
+          <button 
+            className={`nav-tab ${currentView === 'explanation' ? 'active' : ''}`} 
+            onClick={() => setCurrentView('explanation')}
+          >
+            Learn Metrics
+          </button>
+        </nav>
+      </header>
       
-      {status === 'finished' && simulationResults && (
-        <div className="results-container">
-          <div className="gantt-chart-section">
-            <h2>Gantt Chart</h2>
-            <GanttChart data={simulationResults.ganttChart} />
+      {/* Setup View */}
+      {currentView === 'setup' && (
+        <div className="setup-view">
+          <div className="setup-grid">
+            <div className="setup-card input-section">
+              <h2>Add Processes</h2>
+              <ProcessInput addProcess={addProcess} />
+            </div>
+
+            <div className="setup-card controls-section">
+              <h2>Configure Simulation</h2>
+              <Controls
+                selectedAlgorithm={selectedAlgorithm}
+                setSelectedAlgorithm={setSelectedAlgorithm}
+                timeQuantum={timeQuantum}
+                setTimeQuantum={setTimeQuantum}
+                startSimulation={startSimulation}
+                resetSimulation={resetSimulation}
+              />
+            </div>
           </div>
           
-          <div className="execution-history-section">
-            <h2>Process Execution Details</h2>
-            <ExecutionHistory 
-              processes={simulationResults.processes} 
-              ganttChart={simulationResults.rawGanttChart}
-              algorithm={selectedAlgorithm}
-              timeQuantum={selectedAlgorithm === 'RR' ? timeQuantum : undefined}
-            />
+          {processes.length > 0 && (
+            <div className="setup-card process-list-section">
+              <h2>Process List</h2>
+              <ProcessListDisplay processes={processes} />
+              
+              <div className="action-buttons">
+                <button 
+                  className="action-button run-button"
+                  onClick={startSimulation}
+                  disabled={processes.length === 0}
+                >
+                  Run Simulation
+                </button>
+                <button 
+                  className="action-button reset-button"
+                  onClick={() => setProcesses([])}
+                  disabled={processes.length === 0}
+                >
+                  Clear Processes
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Simulation Results View */}
+      {currentView === 'simulation' && simulationResults && (
+        <div className="results-view">
+          <div className="results-grid">
+            <div className="results-card gantt-section">
+              <h2>Gantt Chart</h2>
+              <GanttChart data={simulationResults.ganttChart} />
+            </div>
+            
+            <div className="results-card metrics-section">
+              <h2>Average Metrics</h2>
+              <ResultsDisplay
+                averageTurnaroundTime={simulationResults.averageTurnaroundTime}
+                averageWaitingTime={simulationResults.averageWaitingTime}
+                averageResponseTime={simulationResults.averageResponseTime}
+                processes={simulationResults.processes}
+              />
+            </div>
+            
+            <div className="results-card details-section">
+              <h2>Process Details</h2>
+              <DetailedProcessInfo processes={simulationResults.processes} />
+            </div>
+            
+            <div className="results-card execution-section">
+              <h2>Execution Timeline</h2>
+              <ExecutionHistory 
+                processes={simulationResults.processes} 
+                ganttChart={simulationResults.rawGanttChart}
+                algorithm={selectedAlgorithm}
+                timeQuantum={selectedAlgorithm === 'RR' ? timeQuantum : undefined}
+              />
+            </div>
           </div>
 
-          <div className="detailed-results-section">
-            <h2>Process Metrics</h2>
-            <DetailedProcessInfo processes={simulationResults.processes} />
+          <div className="action-buttons centered">
+            <button 
+              className="action-button setup-button"
+              onClick={() => setCurrentView('setup')}
+            >
+              Back to Setup
+            </button>
+            <button 
+              className="action-button reset-button"
+              onClick={resetSimulation}
+            >
+              Reset Simulation
+            </button>
           </div>
+        </div>
+      )}
+      
+      {/* Metrics Explanation View */}
+      {currentView === 'explanation' && (
+        <div className="explanation-view">
+          <MetricsExplanation />
           
-          <div className="results-section">
-            <h2>Average Metrics</h2>
-            <ResultsDisplay
-              averageTurnaroundTime={simulationResults.averageTurnaroundTime}
-              averageWaitingTime={simulationResults.averageWaitingTime}
-              averageResponseTime={simulationResults.averageResponseTime}
-              processes={simulationResults.processes}
-            />
+          <div className="action-buttons centered">
+            <button 
+              className="action-button back-button"
+              onClick={() => setCurrentView(status === 'finished' ? 'simulation' : 'setup')}
+            >
+              Back
+            </button>
           </div>
         </div>
       )}

@@ -55,12 +55,14 @@ This application helps students and professionals visualize how different CPU sc
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone <repository-url>
    cd scheduling-visualizer
    ```
 
 2. Install dependencies:
+
    ```bash
    yarn
    # or
@@ -68,6 +70,7 @@ This application helps students and professionals visualize how different CPU sc
    ```
 
 3. Start the development server:
+
    ```bash
    yarn dev
    # or
