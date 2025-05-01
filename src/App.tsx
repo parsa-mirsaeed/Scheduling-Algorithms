@@ -11,7 +11,6 @@ import MetricsExplanation from './components/MetricsExplanation'
 import { Process, SimulationResult, fifoScheduling, sjfScheduling, srtScheduling, rrScheduling } from './logic/scheduler'
 
 type Algorithm = 'FIFO' | 'SJF' | 'SRT' | 'RR'
-type AppView = 'setup' | 'simulation' | 'explanation'
 
 function App() {
   // State for processes
@@ -29,8 +28,22 @@ function App() {
   // State for simulation status
   const [status, setStatus] = useState<'idle' | 'running' | 'finished'>('idle')
 
-  // State for the current view
-  const [currentView, setCurrentView] = useState<AppView>('setup')
+  // State for expanded sections (no longer needed for metrics)
+  const [expandedSections, setExpandedSections] = useState({
+    detailedMetrics: false,
+    executionHistory: false
+  });
+
+  // State for Metrics Modal
+  const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
+
+  // Toggle expanded sections (excluding metrics)
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
   // Function to add a process to the list
   const addProcess = (process: Process) => {
@@ -65,69 +78,43 @@ function App() {
     
     setSimulationResults(result)
     setStatus('finished')
-    setCurrentView('simulation')
   }
 
   // Function to reset simulation
   const resetSimulation = () => {
     setStatus('idle')
     setSimulationResults(null)
-    setCurrentView('setup')
   }
 
   return (
-    <div className="app-container">
-      <header className="app-header">
+    <div className="app-container dashboard-layout">
+      <header className="app-header compact">
         <h1>CPU Scheduling Algorithm Visualizer</h1>
-        
-        {/* Navigation Tabs */}
-        <nav className="app-nav">
-          <button 
-            className={`nav-tab ${currentView === 'setup' ? 'active' : ''}`} 
-            onClick={() => setCurrentView('setup')}
-          >
-            Setup
-          </button>
-          <button 
-            className={`nav-tab ${currentView === 'simulation' ? 'active' : ''}`} 
-            onClick={() => setCurrentView('simulation')}
-            disabled={status !== 'finished'}
-          >
-            Simulation Results
-          </button>
-          <button 
-            className={`nav-tab ${currentView === 'explanation' ? 'active' : ''}`} 
-            onClick={() => setCurrentView('explanation')}
-          >
-            Learn Metrics
-          </button>
-        </nav>
+        <p className="app-subtitle">Visualize and compare CPU scheduling algorithms with interactive simulations</p>
       </header>
-      
-      {/* Setup View */}
-      {currentView === 'setup' && (
-        <div className="setup-view">
-          <div className="setup-grid">
-            <div className="setup-card input-section">
-              <h2>Add Processes</h2>
-              <ProcessInput addProcess={addProcess} />
-            </div>
 
-            <div className="setup-card controls-section">
-              <h2>Configure Simulation</h2>
-              <Controls
-                selectedAlgorithm={selectedAlgorithm}
-                setSelectedAlgorithm={setSelectedAlgorithm}
-                timeQuantum={timeQuantum}
-                setTimeQuantum={setTimeQuantum}
-                startSimulation={startSimulation}
-                resetSimulation={resetSimulation}
-              />
-            </div>
+      <div className="dashboard-grid">
+        {/* Input Column */}
+        <div className="dashboard-column input-column">
+          <div className="dashboard-card">
+            <h2>Add Processes</h2>
+            <ProcessInput addProcess={addProcess} />
+          </div>
+          
+          <div className="dashboard-card">
+            <h2>Configure Simulation</h2>
+            <Controls
+              selectedAlgorithm={selectedAlgorithm}
+              setSelectedAlgorithm={setSelectedAlgorithm}
+              timeQuantum={timeQuantum}
+              setTimeQuantum={setTimeQuantum}
+              startSimulation={startSimulation}
+              resetSimulation={resetSimulation}
+            />
           </div>
           
           {processes.length > 0 && (
-            <div className="setup-card process-list-section">
+            <div className="dashboard-card">
               <h2>Process List</h2>
               <ProcessListDisplay processes={processes} />
               
@@ -149,73 +136,98 @@ function App() {
               </div>
             </div>
           )}
-        </div>
-      )}
-      
-      {/* Simulation Results View */}
-      {currentView === 'simulation' && simulationResults && (
-        <div className="results-view">
-          <div className="results-grid">
-            <div className="results-card gantt-section">
-              <h2>Gantt Chart</h2>
-              <GanttChart data={simulationResults.ganttChart} />
-            </div>
-            
-            <div className="results-card metrics-section">
-              <h2>Average Metrics</h2>
-              <ResultsDisplay
-                averageTurnaroundTime={simulationResults.averageTurnaroundTime}
-                averageWaitingTime={simulationResults.averageWaitingTime}
-                averageResponseTime={simulationResults.averageResponseTime}
-                processes={simulationResults.processes}
-              />
-            </div>
-            
-            <div className="results-card details-section">
-              <h2>Process Details</h2>
-              <DetailedProcessInfo processes={simulationResults.processes} />
-            </div>
-            
-            <div className="results-card execution-section">
-              <h2>Execution Timeline</h2>
-              <ExecutionHistory 
-                processes={simulationResults.processes} 
-                ganttChart={simulationResults.rawGanttChart}
-                algorithm={selectedAlgorithm}
-                timeQuantum={selectedAlgorithm === 'RR' ? timeQuantum : undefined}
-              />
-            </div>
-          </div>
 
-          <div className="action-buttons centered">
-            <button 
-              className="action-button setup-button"
-              onClick={() => setCurrentView('setup')}
-            >
-              Back to Setup
-            </button>
-            <button 
-              className="action-button reset-button"
-              onClick={resetSimulation}
-            >
-              Reset Simulation
-            </button>
+          {/* Explanation Toggle - Changed to Modal Trigger Button */}
+          <div className="dashboard-card modal-trigger-card">
+             <button 
+               className="action-button info-button full-width" 
+               onClick={() => setIsMetricsModalOpen(true)}
+             >
+               How Metrics Work
+             </button>
           </div>
         </div>
-      )}
-      
-      {/* Metrics Explanation View */}
-      {currentView === 'explanation' && (
-        <div className="explanation-view">
-          <MetricsExplanation />
-          
-          <div className="action-buttons centered">
-            <button 
-              className="action-button back-button"
-              onClick={() => setCurrentView(status === 'finished' ? 'simulation' : 'setup')}
-            >
-              Back
-            </button>
+
+        {/* Results Column */}
+        <div className="dashboard-column results-column">
+          {status === 'finished' && simulationResults ? (
+            <>
+              <div className="dashboard-card full-width">
+                <h2>Gantt Chart</h2>
+                <GanttChart data={simulationResults.ganttChart} />
+              </div>
+
+              <div className="dashboard-card">
+                <h2>Average Metrics</h2>
+                <ResultsDisplay
+                  averageTurnaroundTime={simulationResults.averageTurnaroundTime}
+                  averageWaitingTime={simulationResults.averageWaitingTime}
+                  averageResponseTime={simulationResults.averageResponseTime}
+                  processes={simulationResults.processes}
+                />
+              </div>
+
+              <div className="dashboard-card toggle-card">
+                <div className="toggle-header" onClick={() => toggleSection('detailedMetrics')}>
+                  <h2>Process Metrics</h2>
+                  <span className="toggle-icon">{expandedSections.detailedMetrics ? '▼' : '▶'}</span>
+                </div>
+                {expandedSections.detailedMetrics && (
+                  <div className="toggle-content">
+                    <DetailedProcessInfo processes={simulationResults.processes} />
+                  </div>
+                )}
+              </div>
+
+              <div className="dashboard-card toggle-card">
+                <div className="toggle-header" onClick={() => toggleSection('executionHistory')}>
+                  <h2>Execution Timeline</h2>
+                  <span className="toggle-icon">{expandedSections.executionHistory ? '▼' : '▶'}</span>
+                </div>
+                {expandedSections.executionHistory && (
+                  <div className="toggle-content">
+                    <ExecutionHistory 
+                      processes={simulationResults.processes} 
+                      ganttChart={simulationResults.rawGanttChart}
+                      algorithm={selectedAlgorithm}
+                      timeQuantum={selectedAlgorithm === 'RR' ? timeQuantum : undefined}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="dashboard-actions">
+                <button 
+                  className="action-button reset-button"
+                  onClick={resetSimulation}
+                >
+                  Reset Simulation
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="dashboard-placeholder">
+              <div className="placeholder-content">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                <h3>Simulation Results Will Appear Here</h3>
+                <p>Add processes and run the simulation to see the results</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Metrics Explanation Modal */}
+      {isMetricsModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsMetricsModalOpen(false)}> 
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}> 
+            <button className="modal-close-button" onClick={() => setIsMetricsModalOpen(false)}>&times;</button>
+            <h2>How Metrics Are Calculated</h2>
+            <MetricsExplanation />
           </div>
         </div>
       )}

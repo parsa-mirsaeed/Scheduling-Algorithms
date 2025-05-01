@@ -26,9 +26,20 @@ const Controls: React.FC<ControlsProps> = ({
 
   // Handler for time quantum input
   const handleQuantumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    if (value > 0) {
-      setTimeQuantum(value);
+    const valueAsString = e.target.value;
+    // Allow empty string temporarily during typing
+    if (valueAsString === '') {
+      // Optionally set to a default or handle as needed, here we just return
+      // If you want to allow clearing the field, you might need to handle this differently
+      // setTimeQuantum(1); // Example: reset to 1 if cleared
+      return;
+    }
+
+    const valueAsNumber = Number(valueAsString);
+    
+    // Check if it's a valid positive number
+    if (!isNaN(valueAsNumber) && valueAsNumber > 0) {
+      setTimeQuantum(valueAsNumber);
     }
   };
 
