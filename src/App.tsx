@@ -72,32 +72,34 @@ function App() {
     <div className="app-container">
       <h1>CPU Scheduling Algorithm Visualizer</h1>
       
-      <div className="input-section">
-        <h2>Add Processes</h2>
-        <ProcessInput addProcess={addProcess} />
-      </div>
-      
-      {processes.length > 0 && (
-        <div className="process-list-section">
-          <h2>Process List</h2>
-          <ProcessListDisplay processes={processes} />
+      <div className="setup-section">
+        <div className="input-section">
+          <h2>Add Processes</h2>
+          <ProcessInput addProcess={addProcess} />
         </div>
-      )}
-      
-      <div className="controls-section">
-        <h2>Controls</h2>
-        <Controls
-          selectedAlgorithm={selectedAlgorithm}
-          setSelectedAlgorithm={setSelectedAlgorithm}
-          timeQuantum={timeQuantum}
-          setTimeQuantum={setTimeQuantum}
-          startSimulation={startSimulation}
-          resetSimulation={resetSimulation}
-        />
+        
+        {processes.length > 0 && (
+          <div className="process-list-section">
+            <h2>Process List</h2>
+            <ProcessListDisplay processes={processes} />
+          </div>
+        )}
+        
+        <div className="controls-section">
+          <h2>Controls</h2>
+          <Controls
+            selectedAlgorithm={selectedAlgorithm}
+            setSelectedAlgorithm={setSelectedAlgorithm}
+            timeQuantum={timeQuantum}
+            setTimeQuantum={setTimeQuantum}
+            startSimulation={startSimulation}
+            resetSimulation={resetSimulation}
+          />
+        </div>
       </div>
       
       {status === 'finished' && simulationResults && (
-        <>
+        <div className="results-container">
           <div className="gantt-chart-section">
             <h2>Gantt Chart</h2>
             <GanttChart data={simulationResults.ganttChart} />
@@ -112,7 +114,7 @@ function App() {
               timeQuantum={selectedAlgorithm === 'RR' ? timeQuantum : undefined}
             />
           </div>
-          
+
           <div className="detailed-results-section">
             <h2>Process Metrics</h2>
             <DetailedProcessInfo processes={simulationResults.processes} />
@@ -126,7 +128,7 @@ function App() {
               averageResponseTime={simulationResults.averageResponseTime}
             />
           </div>
-        </>
+        </div>
       )}
     </div>
   )
