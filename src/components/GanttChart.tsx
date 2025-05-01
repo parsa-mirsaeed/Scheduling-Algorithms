@@ -51,19 +51,65 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
     ctx.beginPath();
     ctx.moveTo(40, yStart + barHeight + 20);
     ctx.lineTo(canvas.width - 40, yStart + barHeight + 20);
+    ctx.lineWidth = 2;
     ctx.stroke();
+    ctx.lineWidth = 1;
+
+    // Collect all unique time points (process transitions)
+    const timePoints = new Set<number>();
+    timePoints.add(firstStartTime);
+    timePoints.add(lastEndTime);
+    data.forEach(item => {
+      timePoints.add(item.startTime);
+      timePoints.add(item.endTime);
+    });
+    const sortedTimePoints = Array.from(timePoints).sort((a, b) => a - b);
 
     // Draw time markers
     ctx.textAlign = 'center';
-    ctx.font = '12px Arial';
+    
+    // Draw all integer time points with minor styling
     for (let t = firstStartTime; t <= lastEndTime; t++) {
       const x = 40 + (t - firstStartTime) * timeUnitWidth;
       ctx.beginPath();
+      
+      // Use shorter lines for regular time points
       ctx.moveTo(x, yStart + barHeight + 15);
       ctx.lineTo(x, yStart + barHeight + 25);
+      ctx.strokeStyle = '#aaaaaa';
       ctx.stroke();
+      
+      // Smaller font for regular time points
+      ctx.font = '10px Arial';
+      ctx.fillStyle = '#666666';
       ctx.fillText(t.toString(), x, yStart + barHeight + 40);
     }
+    
+    // Draw transition points with enhanced styling
+    sortedTimePoints.forEach(t => {
+      const x = 40 + (t - firstStartTime) * timeUnitWidth;
+      
+      // Draw taller line for transition points
+      ctx.beginPath();
+      ctx.moveTo(x, yStart + barHeight + 10);
+      ctx.lineTo(x, yStart + barHeight + 30);
+      ctx.strokeStyle = '#333333';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.lineWidth = 1;
+      
+      // Larger, bold font for transition points
+      ctx.font = 'bold 12px Arial';
+      ctx.fillStyle = '#000000';
+      // Draw with a slight offset to make it stand out
+      ctx.fillText(t.toString(), x, yStart + barHeight + 45);
+      
+      // Add decorative marker for better visibility
+      ctx.beginPath();
+      ctx.arc(x, yStart + barHeight + 20, 3, 0, Math.PI * 2);
+      ctx.fillStyle = '#166088';
+      ctx.fill();
+    });
 
     // Draw the Gantt bars
     data.forEach((item) => {
@@ -76,6 +122,8 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
       
       // Draw the bar
       ctx.fillRect(x, yStart, width, barHeight);
+      ctx.strokeStyle = '#333333';
+      ctx.lineWidth = 1;
       ctx.strokeRect(x, yStart, width, barHeight);
       
       // Draw the process ID
@@ -96,7 +144,7 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
         <canvas 
           ref={canvasRef} 
           width={800} 
-          height={150} 
+          height={180} 
           style={{ maxWidth: '100%', height: 'auto' }}
         />
       )}

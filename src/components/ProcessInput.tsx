@@ -6,39 +6,60 @@ interface ProcessInputProps {
 }
 
 const ProcessInput: React.FC<ProcessInputProps> = ({ addProcess }) => {
-  const [arrivalTime, setArrivalTime] = useState<number>(0);
-  const [burstTime, setBurstTime] = useState<number>(1);
+  const [arrivalTime, setArrivalTime] = useState<string>('');
+  const [burstTime, setBurstTime] = useState<string>('');
   const [error, setError] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Parse values to numbers
+    const arrivalTimeNum = arrivalTime === '' ? 0 : parseInt(arrivalTime, 10);
+    const burstTimeNum = burstTime === '' ? 0 : parseInt(burstTime, 10);
+    
     // Validate inputs
-    if (arrivalTime < 0) {
-      setError('Arrival time cannot be negative');
+    if (arrivalTimeNum < 0 || isNaN(arrivalTimeNum)) {
+      setError('Arrival time must be a non-negative integer');
       return;
     }
     
-    if (burstTime <= 0) {
-      setError('Burst time must be positive');
+    if (burstTimeNum <= 0 || isNaN(burstTimeNum)) {
+      setError('Burst time must be a positive integer');
       return;
     }
     
     // Create new process object (id will be assigned in the parent component)
     const newProcess: Process = {
       id: 0, // This will be set by the parent component
-      arrivalTime,
-      burstTime,
-      remainingTime: burstTime // Initialize remaining time to burst time
+      arrivalTime: arrivalTimeNum,
+      burstTime: burstTimeNum,
+      remainingTime: burstTimeNum // Initialize remaining time to burst time
     };
     
     // Add process to the list
     addProcess(newProcess);
     
     // Reset form
-    setArrivalTime(0);
-    setBurstTime(1);
+    setArrivalTime('');
+    setBurstTime('');
     setError('');
+  };
+
+  // Handle input change with validation
+  const handleArrivalTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow empty string or valid non-negative integer
+    if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) >= 0)) {
+      setArrivalTime(value);
+    }
+  };
+
+  const handleBurstTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow empty string or valid positive integer
+    if (value === '' || (/^\d+$/.test(value) && parseInt(value, 10) > 0)) {
+      setBurstTime(value);
+    }
   };
 
   return (
@@ -47,12 +68,11 @@ const ProcessInput: React.FC<ProcessInputProps> = ({ addProcess }) => {
         <div className="form-group">
           <label htmlFor="arrivalTime">Arrival Time:</label>
           <input
-            type="number"
+            type="text"
             id="arrivalTime"
             value={arrivalTime}
-            onChange={(e) => setArrivalTime(Number(e.target.value))}
-            min="0"
-            step="1"
+            onChange={handleArrivalTimeChange}
+            placeholder="0"
             required
           />
         </div>
@@ -60,12 +80,11 @@ const ProcessInput: React.FC<ProcessInputProps> = ({ addProcess }) => {
         <div className="form-group">
           <label htmlFor="burstTime">Burst Time:</label>
           <input
-            type="number"
+            type="text"
             id="burstTime"
             value={burstTime}
-            onChange={(e) => setBurstTime(Number(e.target.value))}
-            min="1"
-            step="1"
+            onChange={handleBurstTimeChange}
+            placeholder="1"
             required
           />
         </div>
