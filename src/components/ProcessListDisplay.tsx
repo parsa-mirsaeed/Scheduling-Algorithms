@@ -25,15 +25,15 @@ const ProcessListDisplay: React.FC<ProcessListDisplayProps> = ({ processes }) =>
         </thead>
         <tbody>
           <tr>
-            <td className="attribute-name">Arrival Time</td>
-            {processes.map((process) => (
-              <td key={process.id}>{process.arrivalTime}</td>
-            ))}
-          </tr>
-          <tr>
             <td className="attribute-name">Burst Time</td>
             {processes.map((process) => (
               <td key={process.id}>{process.burstTime}</td>
+            ))}
+          </tr>
+          <tr>
+            <td className="attribute-name">Arrival Time</td>
+            {processes.map((process) => (
+              <td key={process.id}>{process.arrivalTime}</td>
             ))}
           </tr>
         </tbody>
