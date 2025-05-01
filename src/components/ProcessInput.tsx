@@ -66,19 +66,6 @@ const ProcessInput: React.FC<ProcessInputProps> = ({ addProcess }) => {
     <div className="process-input">
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="arrivalTime">Arrival Time:</label>
-          <input
-            type="text"
-            id="arrivalTime"
-            className="form-control"
-            value={arrivalTime}
-            onChange={handleArrivalTimeChange}
-            placeholder="0"
-            required
-          />
-        </div>
-        
-        <div className="form-group">
           <label htmlFor="burstTime">Burst Time:</label>
           <input
             type="text"
@@ -87,6 +74,19 @@ const ProcessInput: React.FC<ProcessInputProps> = ({ addProcess }) => {
             value={burstTime}
             onChange={handleBurstTimeChange}
             placeholder="1"
+            required
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="arrivalTime">Arrival Time:</label>
+          <input
+            type="text"
+            id="arrivalTime"
+            className="form-control"
+            value={arrivalTime}
+            onChange={handleArrivalTimeChange}
+            placeholder="0"
             required
           />
         </div>
