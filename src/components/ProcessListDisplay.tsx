@@ -12,7 +12,7 @@ const ProcessListDisplay: React.FC<ProcessListDisplayProps> = ({ processes }) =>
 
   return (
     <div className="process-list">
-      <table>
+      <table className="process-table">
         <thead>
           <tr>
             <th>Process ID</th>
@@ -23,7 +23,7 @@ const ProcessListDisplay: React.FC<ProcessListDisplayProps> = ({ processes }) =>
         <tbody>
           {processes.map((process) => (
             <tr key={process.id}>
-              <td>P{process.id}</td>
+              <td><span className="process-id">P{process.id}</span></td>
               <td>{process.arrivalTime}</td>
               <td>{process.burstTime}</td>
             </tr>

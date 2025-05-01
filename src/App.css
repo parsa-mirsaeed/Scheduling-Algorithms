@@ -156,3 +156,142 @@ table th {
 table tr:nth-child(even) {
   background-color: #f2f2f2;
 }
+
+/* Form control styling */
+.form-control {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+}
+
+.form-control::placeholder {
+  color: #aaa;
+}
+
+.error-message {
+  color: var(--danger-color);
+  font-size: 14px;
+  margin-bottom: 10px;
+  padding: 5px;
+  background-color: rgba(239, 83, 80, 0.1);
+  border-radius: 4px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: var(--secondary-color);
+}
+
+/* Process input button styling */
+.process-input button {
+  margin-top: 5px;
+  background-color: var(--accent-color);
+}
+
+.process-input button:hover {
+  background-color: #2196f3;
+}
+
+/* Gantt chart styling */
+.gantt-chart {
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+.no-data, .no-processes {
+  padding: 20px;
+  text-align: center;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  color: #777;
+}
+
+/* Results display styling */
+.metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.metric {
+  flex: 1;
+  min-width: 200px;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.metric h3 {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.metric-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--secondary-color);
+  margin: 10px 0;
+}
+
+.metric-description {
+  font-size: 12px;
+  color: #777;
+}
+
+/* Process table styling */
+.process-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.process-table th {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 12px 15px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.process-table td {
+  padding: 10px 15px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+
+.process-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.process-table tbody tr:hover {
+  background-color: rgba(79, 195, 247, 0.1);
+}
+
+.process-id {
+  font-weight: bold;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.9em;
+}
