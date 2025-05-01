@@ -77,14 +77,7 @@ function App() {
           <h2>Add Processes</h2>
           <ProcessInput addProcess={addProcess} />
         </div>
-        
-        {processes.length > 0 && (
-          <div className="process-list-section">
-            <h2>Process List</h2>
-            <ProcessListDisplay processes={processes} />
-          </div>
-        )}
-        
+
         <div className="controls-section">
           <h2>Controls</h2>
           <Controls
@@ -96,6 +89,13 @@ function App() {
             resetSimulation={resetSimulation}
           />
         </div>
+        
+        {processes.length > 0 && (
+          <div className="process-list-section">
+            <h2>Process List</h2>
+            <ProcessListDisplay processes={processes} />
+          </div>
+        )}
       </div>
       
       {status === 'finished' && simulationResults && (
