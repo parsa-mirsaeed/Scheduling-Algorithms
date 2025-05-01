@@ -5,6 +5,7 @@ import ProcessListDisplay from './components/ProcessListDisplay'
 import Controls from './components/Controls'
 import GanttChart from './components/GanttChart'
 import ResultsDisplay from './components/ResultsDisplay'
+import DetailedProcessInfo from './components/DetailedProcessInfo'
 import { Process, SimulationResult, fifoScheduling, sjfScheduling, srtScheduling, rrScheduling } from './logic/scheduler'
 
 type Algorithm = 'FIFO' | 'SJF' | 'SRT' | 'RR'
@@ -101,8 +102,13 @@ function App() {
             <GanttChart data={simulationResults.ganttChart} />
           </div>
           
+          <div className="detailed-results-section">
+            <h2>Detailed Process Information</h2>
+            <DetailedProcessInfo processes={simulationResults.processes} />
+          </div>
+          
           <div className="results-section">
-            <h2>Results</h2>
+            <h2>Average Metrics</h2>
             <ResultsDisplay
               averageTurnaroundTime={simulationResults.averageTurnaroundTime}
               averageWaitingTime={simulationResults.averageWaitingTime}
