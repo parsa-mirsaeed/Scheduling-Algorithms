@@ -126,6 +126,7 @@ function App() {
               averageTurnaroundTime={simulationResults.averageTurnaroundTime}
               averageWaitingTime={simulationResults.averageWaitingTime}
               averageResponseTime={simulationResults.averageResponseTime}
+              processes={simulationResults.processes}
             />
           </div>
         </div>
