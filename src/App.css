@@ -1050,3 +1050,29 @@ th, td {
 }
 
 /* --- END NEW MODAL STYLES --- */
+
+/* Preset Selector Styles */
+.preset-selector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.preset-selector label {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+.preset-selector select {
+  background-color: var(--surface);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+/* Dashboard Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(250px, 30%) 1fr;
+  gap: var(--spacing-md);
+  height: calc(100vh - 100px);
+  overflow: hidden;
+}

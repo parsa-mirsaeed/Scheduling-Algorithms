@@ -8,6 +8,7 @@ import ResultsDisplay from './components/ResultsDisplay'
 import DetailedProcessInfo from './components/DetailedProcessInfo'
 import ExecutionHistory from './components/ExecutionHistory'
 import MetricsExplanation from './components/MetricsExplanation'
+import PresetSelector from './components/PresetSelector'
 import { Process, SimulationResult, fifoScheduling, sjfScheduling, srtScheduling, rrScheduling } from './logic/scheduler'
 
 type Algorithm = 'FIFO' | 'SJF' | 'SRT' | 'RR'
@@ -96,6 +97,11 @@ function App() {
       <div className="dashboard-grid">
         {/* Input Column */}
         <div className="dashboard-column input-column">
+          <div className="dashboard-card">
+            <h2>Load Preset Data</h2>
+            <PresetSelector setProcesses={setProcesses} resetSimulation={resetSimulation} />
+          </div>
+          
           <div className="dashboard-card">
             <h2>Add Processes</h2>
             <ProcessInput addProcess={addProcess} />
