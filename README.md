@@ -1,5 +1,8 @@
 # CPU Scheduling Algorithms Visualizer
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub Pages](https://img.shields.io/badge/github%20pages-deployed-brightgreen.svg)](https://parsa-mirsaeed.github.io/Scheduling-Algorithms/)
+
 A React-based web application for visualizing and understanding common CPU scheduling algorithms used in operating systems.
 
 ## Live Demo
