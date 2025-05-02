@@ -14,32 +14,34 @@ const ProcessListDisplay: React.FC<ProcessListDisplayProps> = ({
 
   return (
     <div className="process-list">
-      <table className="process-table">
-        <thead>
-          <tr>
-            <th className="attribute-header">Attribute</th>
-            {processes.map((process) => (
-              <th key={process.id}>
-                <span className="process-id">P{process.id}</span>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="attribute-name">Burst Time</td>
-            {processes.map((process) => (
-              <td key={process.id}>{process.burstTime}</td>
-            ))}
-          </tr>
-          <tr>
-            <td className="attribute-name">Arrival Time</td>
-            {processes.map((process) => (
-              <td key={process.id}>{process.arrivalTime}</td>
-            ))}
-          </tr>
-        </tbody>
-      </table>
+      <div className="process-table-container">
+        <table className="process-table">
+          <thead>
+            <tr>
+              <th className="attribute-header">Attribute</th>
+              {processes.map((process) => (
+                <th key={process.id}>
+                  <span className="process-id">P{process.id}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="attribute-name">Burst Time</td>
+              {processes.map((process) => (
+                <td key={process.id}>{process.burstTime}</td>
+              ))}
+            </tr>
+            <tr>
+              <td className="attribute-name">Arrival Time</td>
+              {processes.map((process) => (
+                <td key={process.id}>{process.arrivalTime}</td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

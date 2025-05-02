@@ -9,7 +9,7 @@ const MetricsExplanation: React.FC = () => {
         <h3>Completion Time (CT)</h3>
         <p>The exact time when a process finishes execution.</p>
         <p className="formula">
-          <InlineMath math={`CT = \text{End time of last execution}`} />
+          <InlineMath math={"CT = \\text{End time of last execution}"} />
         </p>
       </div>
 
@@ -17,7 +17,7 @@ const MetricsExplanation: React.FC = () => {
         <h3>Turnaround Time (TAT)</h3>
         <p>Total time from arrival to completion.</p>
         <p className="formula">
-          <InlineMath math={`TAT = CT - AT`} />
+          <InlineMath math={"TAT = CT - AT"} />
         </p>
         <p className="example">
           <em>Example:</em> If arrival=2, completion=10, then TAT=8
@@ -26,12 +26,17 @@ const MetricsExplanation: React.FC = () => {
 
       <div className="metric-explanation">
         <h3>Waiting Time (WT)</h3>
-        <p>Time spent waiting in ready queue.</p>
+        <p>Time spent waiting in ready queue before first execution.</p>
         <p className="formula">
-          <InlineMath math={`WT = TAT - BT`} />
+          <InlineMath math={"WT = \\text{Start Time} - AT"} />
         </p>
         <p className="example">
-          <em>Example:</em> If TAT=8, burst=5, then WT=3
+          <em>Example:</em> If arrival=2, start=5, then WT=3
+        </p>
+        <p className="alternative-formula">
+          <em>Alternative definition:</em> <InlineMath math={"WT = TAT - BT"} />
+          <br/>
+          <small>(Standard in preemptive algorithms to account for all waiting periods)</small>
         </p>
       </div>
 
@@ -39,7 +44,7 @@ const MetricsExplanation: React.FC = () => {
         <h3>Response Time (RT)</h3>
         <p>Time until first CPU execution.</p>
         <p className="formula">
-          <InlineMath math={`RT = \text{First start time} - AT`} />
+          <InlineMath math={"RT = \\text{First start time} - AT"} />
         </p>
         <p className="example">
           <em>Example:</em> If arrival=2, first run=4, then RT=2

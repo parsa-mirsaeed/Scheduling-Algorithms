@@ -34,35 +34,37 @@ const DetailedProcessInfo: React.FC<DetailedProcessInfoProps> = ({
       </div>
 
       {isExpanded && (
-        <>
-          <table className="detailed-table">
-            <thead>
-              <tr>
-                <th>Process ID</th>
-                <th>Arrival Time</th>
-                <th>Burst Time</th>
-                <th>Completion Time</th>
-                <th>Turnaround Time</th>
-                <th>Waiting Time</th>
-                <th>Response Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {processes.map((process) => (
-                <tr key={process.id}>
-                  <td>
-                    <span className="process-id">P{process.id}</span>
-                  </td>
-                  <td>{process.arrivalTime}</td>
-                  <td>{process.burstTime}</td>
-                  <td>{formatNumber(process.completionTime)}</td>
-                  <td>{formatNumber(process.turnaroundTime)}</td>
-                  <td>{formatNumber(process.waitingTime)}</td>
-                  <td>{formatNumber(process.responseTime)}</td>
+        <div className="detailed-content">
+          <div className="table-container">
+            <table className="detailed-table">
+              <thead>
+                <tr>
+                  <th>Process ID</th>
+                  <th>Arrival Time</th>
+                  <th>Burst Time</th>
+                  <th>Completion Time</th>
+                  <th>Turnaround Time</th>
+                  <th>Waiting Time</th>
+                  <th>Response Time</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {processes.map((process) => (
+                  <tr key={process.id}>
+                    <td>
+                      <span className="process-id">P{process.id}</span>
+                    </td>
+                    <td>{process.arrivalTime}</td>
+                    <td>{process.burstTime}</td>
+                    <td>{formatNumber(process.completionTime)}</td>
+                    <td>{formatNumber(process.turnaroundTime)}</td>
+                    <td>{formatNumber(process.waitingTime)}</td>
+                    <td>{formatNumber(process.responseTime)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           <div className="metrics-explanation">
             <div className="metric-explanation">
@@ -78,7 +80,7 @@ const DetailedProcessInfo: React.FC<DetailedProcessInfoProps> = ({
               <p>First CPU Time − Arrival Time</p>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

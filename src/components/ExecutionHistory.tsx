@@ -62,7 +62,7 @@ const ExecutionHistory: React.FC<ExecutionHistoryProps> = ({
         className="collapsible-header"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <h3>Execution History {isExpanded ? "▼" : "▶"}</h3>
+        <h3>Execution Timeline {isExpanded ? "▼" : "▶"}</h3>
         <p className="collapsible-description">
           See how each process was executed over time, including remaining time
           after each execution
@@ -73,7 +73,7 @@ const ExecutionHistory: React.FC<ExecutionHistoryProps> = ({
       </div>
 
       {isExpanded && (
-        <div className="execution-details">
+        <div className="execution-details" style={{ width: "100%" }}>
           {processTimeline.map((process) => (
             <div key={process.processId} className="process-execution">
               <h4>
@@ -82,38 +82,40 @@ const ExecutionHistory: React.FC<ExecutionHistoryProps> = ({
               </h4>
 
               {process.executionSteps.length > 0 ? (
-                <table className="execution-table">
-                  <thead>
-                    <tr>
-                      <th>Execution #</th>
-                      <th>Time Interval</th>
-                      <th>CPU Time</th>
-                      <th>Remaining Before</th>
-                      <th>Remaining After</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {process.executionSteps.map((step) => (
-                      <tr key={step.stepNumber}>
-                        <td>{step.stepNumber}</td>
-                        <td>
-                          {step.startTime} → {step.endTime}
-                        </td>
-                        <td>{step.executionTime}</td>
-                        <td>{step.remainingBefore}</td>
-                        <td>
-                          <span
-                            className={
-                              step.remainingAfter === 0 ? "completed" : ""
-                            }
-                          >
-                            {step.remainingAfter}
-                          </span>
-                        </td>
+                <div className="table-container">
+                  <table className="execution-table">
+                    <thead>
+                      <tr>
+                        <th>Execution #</th>
+                        <th>Time Interval</th>
+                        <th>CPU Time</th>
+                        <th>Remaining Before</th>
+                        <th>Remaining After</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {process.executionSteps.map((step) => (
+                        <tr key={step.stepNumber}>
+                          <td>{step.stepNumber}</td>
+                          <td>
+                            {step.startTime} → {step.endTime}
+                          </td>
+                          <td>{step.executionTime}</td>
+                          <td>{step.remainingBefore}</td>
+                          <td>
+                            <span
+                              className={
+                                step.remainingAfter === 0 ? "completed" : ""
+                              }
+                            >
+                              {step.remainingAfter}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               ) : (
                 <p className="no-executions">
                   No executions recorded for this process.

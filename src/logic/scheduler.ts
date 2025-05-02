@@ -73,7 +73,7 @@ export function fifoScheduling(processes: Process[]): SimulationResult {
 
     // Calculate turnaround time, waiting time, and response time
     process.turnaroundTime = process.completionTime - process.arrivalTime;
-    process.waitingTime = process.turnaroundTime - process.burstTime;
+    process.waitingTime = process.startTime - process.arrivalTime;
     process.responseTime = process.startTime - process.arrivalTime;
 
     // Add entry to Gantt chart
@@ -168,8 +168,7 @@ export function sjfScheduling(processes: Process[]): SimulationResult {
     // Calculate metrics
     shortestJob.turnaroundTime =
       shortestJob.completionTime - shortestJob.arrivalTime;
-    shortestJob.waitingTime =
-      shortestJob.turnaroundTime - shortestJob.burstTime;
+    shortestJob.waitingTime = shortestJob.startTime - shortestJob.arrivalTime;
     shortestJob.responseTime = shortestJob.startTime - shortestJob.arrivalTime;
 
     // Add to Gantt chart
@@ -321,7 +320,7 @@ export function srtScheduling(processes: Process[]): SimulationResult {
       currentProcess.turnaroundTime =
         currentProcess.completionTime - currentProcess.arrivalTime;
       currentProcess.waitingTime =
-        currentProcess.turnaroundTime - currentProcess.burstTime;
+        currentProcess.startTime - currentProcess.arrivalTime;
       currentProcess.responseTime =
         currentProcess.startTime - currentProcess.arrivalTime;
     }
@@ -464,7 +463,7 @@ export function rrScheduling(
       currentProcess.turnaroundTime =
         currentProcess.completionTime - currentProcess.arrivalTime;
       currentProcess.waitingTime =
-        currentProcess.turnaroundTime - currentProcess.burstTime;
+        currentProcess.startTime - currentProcess.arrivalTime;
       currentProcess.responseTime =
         currentProcess.startTime - currentProcess.arrivalTime;
     } else {
