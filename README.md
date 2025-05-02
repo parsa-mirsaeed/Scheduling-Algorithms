@@ -2,6 +2,10 @@
 
 A React-based web application for visualizing and understanding common CPU scheduling algorithms used in operating systems.
 
+## Live Demo
+
+**[View Live Demo](https://parsa-mirsaeed.github.io/Scheduling-Algorithms/)**
+
 ## Overview
 
 This application helps students and professionals visualize how different CPU scheduling algorithms work. It provides an interactive interface to input processes with their arrival times and burst times, simulate different scheduling algorithms, and view the resulting Gantt chart and performance metrics.
@@ -57,7 +61,7 @@ This application helps students and professionals visualize how different CPU sc
 1. Clone the repository:
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/parsa-mirsaeed/Scheduling-Algorithms.git
    cd scheduling-visualizer
    ```
 
@@ -102,7 +106,7 @@ This project is released under the MIT License.
 
 ## Contributors
 
-- [Parsa MirSaeed ](https://github.com/parsa-mirsaeed)
+- [Parsa MirSaeed](https://github.com/parsa-mirsaeed)
 
 ---
 
