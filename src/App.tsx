@@ -30,6 +30,9 @@ function App() {
   // State for time quantum (for Round Robin)
   const [timeQuantum, setTimeQuantum] = useState<number>(1);
 
+  // State for context switch time (for Round Robin, optional)
+  const [contextSwitchTime, setContextSwitchTime] = useState<number>(0);
+
   // State for simulation results
   const [simulationResults, setSimulationResults] =
     useState<SimulationResult | null>(null);
@@ -79,7 +82,7 @@ function App() {
         result = srtScheduling([...processes]);
         break;
       case "RR":
-        result = rrScheduling([...processes], timeQuantum);
+        result = rrScheduling([...processes], timeQuantum, contextSwitchTime);
         break;
       default:
         result = fifoScheduling([...processes]);
@@ -128,6 +131,8 @@ function App() {
               setSelectedAlgorithm={setSelectedAlgorithm}
               timeQuantum={timeQuantum}
               setTimeQuantum={setTimeQuantum}
+              contextSwitchTime={contextSwitchTime}
+              setContextSwitchTime={setContextSwitchTime}
               startSimulation={startSimulation}
               resetSimulation={resetSimulation}
             />

@@ -179,12 +179,28 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
       const x = 40 + (item.startTime - firstStartTime) * timeUnitWidth;
       const width = (item.endTime - item.startTime) * timeUnitWidth;
 
-      // Use color based on process ID (cycle through colors array)
-      const colorIndex = (item.processId - 1) % colors.length;
-      ctx.fillStyle = colors[colorIndex];
+      let barColor: string;
+      let label: string;
+      let showDuration = true;
+
+      // Handle context switch blocks
+      if (item.processId === -1) {
+        barColor = "#bdbdbd"; // A neutral grey color for context switch
+        label = "CS";
+        showDuration = false; // Don't show duration for CS
+      } else {
+        // Use color based on process ID (cycle through colors array)
+        // Ensure processId is positive and 1-based for indexing
+        const colorIndex = Math.max(0, item.processId - 1) % colors.length;
+        barColor = colors[colorIndex];
+        label = `P${item.processId}`;
+      }
+
+      // Set fill style
+      ctx.fillStyle = barColor;
 
       // Draw rounded rectangle for the bar
-      const radius = Math.min(8, width / 2); // Avoid too large radius for small bars
+      const radius = Math.min(8, Math.max(0, width) / 2); // Ensure radius isn't negative
       ctx.beginPath();
       ctx.moveTo(x + radius, yStart);
       ctx.lineTo(x + width - radius, yStart);
@@ -213,16 +229,16 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Draw the process ID
-      ctx.fillStyle = getContrastColor(colors[colorIndex]);
+      // Draw the label text
+      ctx.fillStyle = getContrastColor(barColor); // Pass the determined barColor
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.font = "bold 14px Inter, Roboto, sans-serif";
 
-      // Add time duration if wide enough
-      if (width > 50) {
+      // Add time duration if wide enough and not a context switch
+      if (width > 50 && showDuration) {
         ctx.fillText(
-          `P${item.processId}`,
+          label, // Use dynamic label
           x + width / 2,
           yStart + barHeight / 2 - 8,
         );
@@ -232,9 +248,9 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
           x + width / 2,
           yStart + barHeight / 2 + 12,
         );
-      } else {
+      } else if (width > 5) { // Only draw label if bar is minimally wide
         ctx.fillText(
-          `P${item.processId}`,
+          label, // Use dynamic label
           x + width / 2,
           yStart + barHeight / 2,
         );
@@ -244,6 +260,11 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
 
   // Helper function to determine text color based on background for contrast
   const getContrastColor = (hexColor: string): string => {
+    // Handle potential undefined or invalid hexColor input gracefully
+    if (!hexColor || !/^#[0-9A-F]{6}$/i.test(hexColor)) {
+      return "#000000"; // Default to black if color is invalid
+    }
+
     // Extract RGB components
     const r = parseInt(hexColor.slice(1, 3), 16);
     const g = parseInt(hexColor.slice(3, 5), 16);

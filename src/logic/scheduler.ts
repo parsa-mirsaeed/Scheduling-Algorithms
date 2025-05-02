@@ -354,12 +354,13 @@ export function srtScheduling(processes: Process[]): SimulationResult {
   };
 }
 
-// RR (Round Robin) algorithm implementation
+// Round Robin (RR) algorithm implementation
 export function rrScheduling(
   processes: Process[],
   timeQuantum: number,
+  contextSwitchTime: number, // Added context switch time parameter
 ): SimulationResult {
-  if (processes.length === 0 || timeQuantum <= 0) {
+  if (processes.length === 0) {
     return {
       ganttChart: [],
       rawGanttChart: [],
@@ -370,146 +371,173 @@ export function rrScheduling(
     };
   }
 
-  // Clone processes to avoid mutating the original array
   const processesClone = cloneProcesses(processes);
-
-  // Initialize remaining times
   processesClone.forEach((p) => {
     p.remainingTime = p.burstTime;
+    p.startTime = undefined; // Ensure startTime is reset
+    p.completionTime = undefined; // Ensure completionTime is reset
   });
 
-  const ganttChart: GanttItem[] = [];
-  const rawGanttChart: GanttItem[] = []; // Store raw steps here
-  let currentTime = Math.min(...processesClone.map((p) => p.arrivalTime));
-  let completedCount = 0;
-
-  // Ready queue for processes
   const readyQueue: Process[] = [];
-  let lastProcessId = -1;
+  const rawGanttChart: GanttItem[] = [];
+  let currentTime = 0;
+  let completedCount = 0;
+  let lastProcessId: number | null = null; // Track the last run process ID
+  const processMap = new Map(processesClone.map((p) => [p.id, p]));
+  let timePointer = 0; // Keeps track of next process index to check for arrival
 
-  // Continue until all processes are completed
+  processesClone.sort((a, b) => a.arrivalTime - b.arrivalTime); // Sort by arrival initially
+
   while (completedCount < processesClone.length) {
-    // Add newly arrived processes to ready queue
-    for (const process of processesClone) {
-      if (
-        process.arrivalTime <= currentTime &&
-        process.remainingTime &&
-        process.remainingTime > 0 &&
-        !readyQueue.includes(process)
-      ) {
-        readyQueue.push(process);
-      }
+    // Add newly arrived processes to the ready queue
+    while (
+      timePointer < processesClone.length &&
+      processesClone[timePointer].arrivalTime <= currentTime
+    ) {
+      readyQueue.push(processesClone[timePointer]);
+      timePointer++;
     }
 
     if (readyQueue.length === 0) {
-      // No process in ready queue, jump to next arrival
-      const notArrivedProcesses = processesClone.filter(
-        (p) =>
-          p.arrivalTime > currentTime && p.remainingTime && p.remainingTime > 0,
-      );
-
-      if (notArrivedProcesses.length > 0) {
-        currentTime = Math.min(
-          ...notArrivedProcesses.map((p) => p.arrivalTime),
-        );
-        continue;
+      // If no process is ready, advance time to the next arrival
+      if (timePointer < processesClone.length) {
+        currentTime = processesClone[timePointer].arrivalTime;
+        // Add newly arrived process(es) after advancing time
+        while (
+          timePointer < processesClone.length &&
+          processesClone[timePointer].arrivalTime <= currentTime
+        ) {
+          readyQueue.push(processesClone[timePointer]);
+          timePointer++;
+        }
       } else {
-        // Should never reach here if implementation is correct
+        // No more processes to arrive and queue is empty, should be done
         break;
       }
     }
 
-    // Get next process from the queue
-    const currentProcess = readyQueue.shift()!;
+    if (readyQueue.length > 0) {
+        const currentProcess = readyQueue.shift()!; // Get the next process
 
-    // Record start time if first execution
-    if (currentProcess.startTime === undefined) {
-      currentProcess.startTime = currentTime;
-    }
-
-    // Determine execution time (minimum of time quantum and remaining time)
-    const executeTime = Math.min(timeQuantum, currentProcess.remainingTime!);
-
-    // Add raw step to rawGanttChart
-    rawGanttChart.push({
-      processId: currentProcess.id,
-      startTime: currentTime,
-      endTime: currentTime + executeTime,
-    });
-
-    // Only add to Gantt chart if there's a process switch
-    if (lastProcessId !== currentProcess.id) {
-      ganttChart.push({
-        processId: currentProcess.id,
-        startTime: currentTime,
-        endTime: currentTime + executeTime,
-      });
-      lastProcessId = currentProcess.id;
-    } else if (ganttChart.length > 0) {
-      // Extend the last Gantt item
-      ganttChart[ganttChart.length - 1].endTime = currentTime + executeTime;
-    }
-
-    // Execute process for the determined time
-    currentTime += executeTime;
-    currentProcess.remainingTime! -= executeTime;
-
-    // Check if process is completed
-    if (currentProcess.remainingTime === 0) {
-      completedCount++;
-      currentProcess.completionTime = currentTime;
-
-      // Calculate metrics
-      currentProcess.turnaroundTime =
-        currentProcess.completionTime - currentProcess.arrivalTime;
-      currentProcess.waitingTime =
-        currentProcess.turnaroundTime - currentProcess.burstTime;
-      currentProcess.responseTime =
-        currentProcess.startTime - currentProcess.arrivalTime;
-    } else {
-      // Add back to ready queue if not completed
-      // Check for new arrivals before re-adding current process
-      for (const process of processesClone) {
-        if (
-          process.arrivalTime <= currentTime &&
-          process.remainingTime &&
-          process.remainingTime > 0 &&
-          !readyQueue.includes(process) &&
-          process !== currentProcess
-        ) {
-          readyQueue.push(process);
+        // --- Context Switch Handling ---
+        // Apply context switch time only if switching *between different* processes
+        if (lastProcessId !== null && lastProcessId !== currentProcess.id) {
+            const switchStartTime = currentTime;
+            currentTime += contextSwitchTime;
+            rawGanttChart.push({
+                processId: -1, // Use -1 or a specific ID for context switch
+                startTime: switchStartTime,
+                endTime: currentTime,
+            });
+            // Re-check for arrivals during the context switch
+            while (
+                timePointer < processesClone.length &&
+                processesClone[timePointer].arrivalTime <= currentTime
+                ) {
+                readyQueue.push(processesClone[timePointer]);
+                timePointer++;
+            }
         }
-      }
-      readyQueue.push(currentProcess);
-    }
-  }
+        // ------------------------------
 
-  // Consolidate consecutive Gantt chart entries for the visual chart
-  const consolidatedGantt: GanttItem[] = [];
-  for (const item of rawGanttChart) {
-    // Consolidate from raw chart
-    if (
-      consolidatedGantt.length === 0 ||
-      consolidatedGantt[consolidatedGantt.length - 1].processId !==
-        item.processId ||
-      consolidatedGantt[consolidatedGantt.length - 1].endTime !== item.startTime
-    ) {
-      // Also check for time gap
-      consolidatedGantt.push({ ...item });
+        const burstStartTime = currentTime;
+
+        // Record start time (first time CPU is allocated)
+        if (currentProcess.startTime === undefined) {
+            currentProcess.startTime = burstStartTime;
+            currentProcess.responseTime = currentProcess.startTime - currentProcess.arrivalTime;
+        }
+
+        // Determine time slice for execution
+        const timeSlice = Math.min(
+            timeQuantum,
+            currentProcess.remainingTime!,
+        );
+
+        // Execute process
+        currentProcess.remainingTime! -= timeSlice;
+        currentTime += timeSlice;
+        lastProcessId = currentProcess.id; // Update last run process ID
+
+        // Add execution block to raw Gantt chart
+        rawGanttChart.push({
+            processId: currentProcess.id,
+            startTime: burstStartTime,
+            endTime: currentTime,
+        });
+
+        // Add processes that arrived *during* this execution slice
+        while (
+            timePointer < processesClone.length &&
+            processesClone[timePointer].arrivalTime <= currentTime
+            ) {
+            readyQueue.push(processesClone[timePointer]);
+            timePointer++;
+        }
+
+        // Handle process completion or requeue
+        if (currentProcess.remainingTime! <= 0) {
+            currentProcess.completionTime = currentTime;
+            currentProcess.turnaroundTime =
+                currentProcess.completionTime - currentProcess.arrivalTime;
+            currentProcess.waitingTime =
+                currentProcess.turnaroundTime - currentProcess.burstTime;
+            completedCount++;
+            // Process finished, don't add back to queue
+        } else {
+            // Process not finished, add back to the end of the queue
+            readyQueue.push(currentProcess);
+        }
+    } else if (timePointer >= processesClone.length) {
+         // No processes in ready queue and no more arrivals means we are done
+         break;
     } else {
-      consolidatedGantt[consolidatedGantt.length - 1].endTime = item.endTime;
+        // Should not happen if logic is correct, advance time minimally?
+        // Or handled by the initial check in the loop for empty queue
+        currentTime++; // Minimal advance if stuck? Needs review.
     }
+
+
   }
 
-  // Calculate averages
+  const consolidatedGantt = consolidateGanttChart(rawGanttChart);
   const metrics = calculateMetrics(processesClone);
 
   return {
-    ganttChart: consolidatedGantt, // Use consolidated for visual chart
-    rawGanttChart: rawGanttChart, // Use raw for execution history
+    ganttChart: consolidatedGantt,
+    rawGanttChart: rawGanttChart,
     processes: processesClone,
     ...metrics,
   };
+}
+
+// Helper function to consolidate Gantt chart entries
+// Merges consecutive blocks of the same process or context switch
+function consolidateGanttChart(rawGantt: GanttItem[]): GanttItem[] {
+  if (!rawGantt || rawGantt.length === 0) {
+    return [];
+  }
+
+  const consolidated: GanttItem[] = [];
+  let currentBlock = { ...rawGantt[0] };
+
+  for (let i = 1; i < rawGantt.length; i++) {
+    const nextBlock = rawGantt[i];
+    // Merge if the next block starts exactly where the current one ends
+    // AND they belong to the same process (or both are context switches)
+    if (
+      nextBlock.startTime === currentBlock.endTime &&
+      nextBlock.processId === currentBlock.processId
+    ) {
+      currentBlock.endTime = nextBlock.endTime; // Extend the current block
+    } else {
+      consolidated.push(currentBlock); // Push the completed block
+      currentBlock = { ...nextBlock }; // Start a new block
+    }
+  }
+  consolidated.push(currentBlock); // Push the last block
+
+  return consolidated;
 }
 
 // Helper function to calculate metrics from completed processes

@@ -7,6 +7,8 @@ interface ControlsProps {
   setSelectedAlgorithm: (algorithm: Algorithm) => void;
   timeQuantum: number;
   setTimeQuantum: (quantum: number) => void;
+  contextSwitchTime: number;
+  setContextSwitchTime: (time: number) => void;
   startSimulation: () => void;
   resetSimulation: () => void;
 }
@@ -16,6 +18,8 @@ const Controls: React.FC<ControlsProps> = ({
   setSelectedAlgorithm,
   timeQuantum,
   setTimeQuantum,
+  contextSwitchTime,
+  setContextSwitchTime,
   startSimulation,
   resetSimulation,
 }) => {
@@ -43,6 +47,26 @@ const Controls: React.FC<ControlsProps> = ({
     }
   };
 
+  // Handler for context switch time input
+  const handleContextSwitchChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const valueAsString = e.target.value;
+    if (valueAsString === "") {
+      setContextSwitchTime(0); // Default to 0 if field is cleared
+      return;
+    }
+    const valueAsNumber = Number(valueAsString);
+    // Allow 0 or positive integers
+    if (
+      !isNaN(valueAsNumber) &&
+      valueAsNumber >= 0 &&
+      Number.isInteger(valueAsNumber)
+    ) {
+      setContextSwitchTime(valueAsNumber);
+    }
+  };
+
   return (
     <div className="controls">
       <div className="form-group">
@@ -61,18 +85,33 @@ const Controls: React.FC<ControlsProps> = ({
 
       {/* Show time quantum input only for Round Robin */}
       {selectedAlgorithm === "RR" && (
-        <div className="form-group">
-          <label htmlFor="timeQuantum">Time Quantum:</label>
-          <input
-            type="number"
-            id="timeQuantum"
-            value={timeQuantum}
-            onChange={handleQuantumChange}
-            min="1"
-            step="1"
-            required
-          />
-        </div>
+        <>
+          <div className="form-group">
+            <label htmlFor="timeQuantum">Time Quantum:</label>
+            <input
+              type="number"
+              id="timeQuantum"
+              value={timeQuantum}
+              onChange={handleQuantumChange}
+              min="1"
+              step="1"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="contextSwitchTime">
+              Context Switch Time (Optional):
+            </label>
+            <input
+              type="number"
+              id="contextSwitchTime"
+              value={contextSwitchTime}
+              onChange={handleContextSwitchChange}
+              min="0" // Allow 0
+              step="1"
+            />
+          </div>
+        </>
       )}
 
       <div className="button-group">
