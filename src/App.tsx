@@ -141,7 +141,10 @@ function App() {
           {processes.length > 0 && (
             <div className="dashboard-card">
               <h2>Process List</h2>
-              <ProcessListDisplay processes={processes} />
+              <ProcessListDisplay 
+                processes={processes} 
+                onProcessesUpdate={setProcesses}
+              />
 
               <div className="action-buttons">
                 <button

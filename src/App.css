@@ -1207,3 +1207,74 @@ th, td {
     grid-template-columns: 1fr;
   }
 }
+
+/* Process table edit controls */
+.process-edit-controls {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.edit-button {
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.edit-button:hover {
+  background-color: var(--secondary-dark);
+}
+
+.edit-button:disabled {
+  background-color: var(--disabled);
+  cursor: not-allowed;
+}
+
+.save-button {
+  background-color: var(--success);
+}
+
+.save-button:hover {
+  background-color: var(--success-dark);
+}
+
+.cancel-button {
+  background-color: var(--error);
+}
+
+.cancel-button:hover {
+  background-color: var(--error-dark);
+}
+
+.process-input {
+  width: 50px;
+  text-align: center;
+  padding: var(--spacing-xs);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+}
+
+.process-table td {
+  transition: background-color 0.2s;
+}
+
+.process-table td:has(.process-input) {
+  padding: 4px;
+  background-color: rgba(var(--primary-rgb), 0.05);
+}
+
+/* Add these RGB color values if they don't exist in your root styles */
+:root {
+  --success: #4caf50;
+  --success-dark: #3d8b40;
+  --error: #f44336;
+  --error-dark: #d32f2f;
+  --disabled: #9e9e9e;
+  --primary-rgb: 63, 81, 181; /* Equivalent to #3f51b5 */
+}
