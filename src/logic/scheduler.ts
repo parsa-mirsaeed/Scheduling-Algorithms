@@ -383,7 +383,7 @@ export function rrScheduling(
   let currentTime = 0;
   let completedCount = 0;
   let lastProcessId: number | null = null; // Track the last run process ID
-  const processMap = new Map(processesClone.map((p) => [p.id, p]));
+  // const processMap = new Map(processesClone.map((p) => [p.id, p])); // Unused variable
   let timePointer = 0; // Keeps track of next process index to check for arrival
 
   processesClone.sort((a, b) => a.arrivalTime - b.arrivalTime); // Sort by arrival initially

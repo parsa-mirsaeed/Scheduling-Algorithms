@@ -34,32 +34,33 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     (sum, p) => sum + (p.waitingTime ?? 0),
     0,
   );
-  
+
   // Create detailed string showing the calculation for each process
   // Using process ID (P1, P2, etc.) makes the display more compact and readable
-  const waitingTimeTerms = processes.map((p, idx) => {
+  const waitingTimeTerms = processes.map((p) => {
     const term = isPreemptive
       ? `((${p.completionTime ?? 0}-${p.arrivalTime})-${p.burstTime})`
       : `(${p.startTime ?? 0}-${p.arrivalTime})`;
     return { id: `P${p.id}`, term, value: p.waitingTime ?? 0 };
   });
-  
+
   // For displaying calculations in step 1 layout with process labels
-  const waitingTimeFormulaItems = waitingTimeTerms.map(item => 
-    `\\text{${item.id}}: ${item.term}`
-  ).join(", ");
-  
+  // const waitingTimeFormulaItems = waitingTimeTerms.map((item) =>
+  //   `\\text{${item.id}}: ${item.term}`
+  // ).join(", ");
+
   // For displaying values in step 2 layout with process labels
-  const waitingTimeValueItems = waitingTimeTerms.map(item => 
-    `\\text{${item.id}}: ${formatNumber(item.value)}`
-  ).join(", ");
-  
+  // const waitingTimeValueItems = waitingTimeTerms.map((item) =>
+  //   `\\text{${item.id}}: ${formatNumber(item.value)}`
+  // ).join(", ");
+
   const waitingFormula = isPreemptive
     ? `\\text{Avg WT} = \\frac{\\sum (\\text{TAT} - \\text{BT})}{\\text{n}}`
     : `\\text{Avg WT} = \\frac{\\sum (\\text{Start Time} - \\text{AT})}{\\text{n}}`;
-  
-  const waitingStep1 = `\\text{Avg WT} = \\frac{${waitingTimeFormulaItems}}{${numProcesses}}`;
-  const waitingStep2 = `\\text{Avg WT} = \\frac{${waitingTimeValueItems}}{${numProcesses}}`;
+
+  // Unused KaTeX strings, removed to fix build errors
+  // const waitingStep1 = `\\text{Avg WT} = \\frac{${waitingTimeFormulaItems}}{${numProcesses}}`;
+  // const waitingStep2 = `\\text{Avg WT} = \\frac{${waitingTimeValueItems}}{${numProcesses}}`;
   const waitingStep3 = `\\text{Avg WT} = \\frac{${formatNumber(totalWaitingTime)}}{${numProcesses}}`;
   const waitingResult = formatNumber(averageWaitingTime);
 
@@ -68,26 +69,27 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     (sum, p) => sum + (p.turnaroundTime ?? 0),
     0,
   );
-  
+
   // Create detailed string showing the calculation for each process with process IDs
-  const tatTerms = processes.map((p, idx) => {
+  const tatTerms = processes.map((p) => {
     const term = `(${p.completionTime ?? 0}-${p.arrivalTime})`;
     return { id: `P${p.id}`, term, value: p.turnaroundTime ?? 0 };
   });
-  
+
   // For displaying calculations in step 1 layout with process labels
-  const tatFormulaItems = tatTerms.map(item => 
-    `\\text{${item.id}}: ${item.term}`
-  ).join(", ");
-  
+  // const tatFormulaItems = tatTerms.map((item) =>
+  //   `\\text{${item.id}}: ${item.term}`
+  // ).join(", ");
+
   // For displaying values in step 2 layout with process labels
-  const tatValueItems = tatTerms.map(item => 
-    `\\text{${item.id}}: ${formatNumber(item.value)}`
-  ).join(", ");
-  
+  // const tatValueItems = tatTerms.map((item) =>
+  //   `\\text{${item.id}}: ${formatNumber(item.value)}`
+  // ).join(", ");
+
   const turnaroundFormula = `\\text{Avg TAT} = \\frac{\\sum (\\text{CT} - \\text{AT})}{\\text{n}}`;
-  const turnaroundStep1 = `\\text{Avg TAT} = \\frac{${tatFormulaItems}}{${numProcesses}}`;
-  const turnaroundStep2 = `\\text{Avg TAT} = \\frac{${tatValueItems}}{${numProcesses}}`;
+  // Unused KaTeX strings, removed to fix build errors
+  // const turnaroundStep1 = `\\text{Avg TAT} = \\frac{${tatFormulaItems}}{${numProcesses}}`;
+  // const turnaroundStep2 = `\\text{Avg TAT} = \\frac{${tatValueItems}}{${numProcesses}}`;
   const turnaroundStep3 = `\\text{Avg TAT} = \\frac{${formatNumber(totalTurnaroundTime)}}{${numProcesses}}`;
   const turnaroundResult = formatNumber(averageTurnaroundTime);
 
