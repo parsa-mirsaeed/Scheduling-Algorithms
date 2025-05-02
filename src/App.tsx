@@ -190,6 +190,7 @@ function App() {
                   }
                   averageWaitingTime={simulationResults.averageWaitingTime}
                   averageResponseTime={simulationResults.averageResponseTime}
+                  cpuUtilization={simulationResults.cpuUtilization}
                   processes={simulationResults.processes}
                   algorithmType={selectedAlgorithm}
                 />

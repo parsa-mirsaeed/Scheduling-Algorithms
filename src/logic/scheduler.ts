@@ -26,6 +26,7 @@ export interface SimulationResult {
   averageTurnaroundTime: number;
   averageWaitingTime: number;
   averageResponseTime: number;
+  cpuUtilization: number; // Added CPU utilization metric
 }
 
 // Deep clone a process array to avoid mutation
@@ -43,6 +44,7 @@ export function fifoScheduling(processes: Process[]): SimulationResult {
       averageTurnaroundTime: 0,
       averageWaitingTime: 0,
       averageResponseTime: 0,
+      cpuUtilization: 0,
     };
   }
 
@@ -105,6 +107,7 @@ export function sjfScheduling(processes: Process[]): SimulationResult {
       averageTurnaroundTime: 0,
       averageWaitingTime: 0,
       averageResponseTime: 0,
+      cpuUtilization: 0,
     };
   }
 
@@ -203,6 +206,7 @@ export function srtScheduling(processes: Process[]): SimulationResult {
       averageTurnaroundTime: 0,
       averageWaitingTime: 0,
       averageResponseTime: 0,
+      cpuUtilization: 0,
     };
   }
 
@@ -368,6 +372,7 @@ export function rrScheduling(
       averageTurnaroundTime: 0,
       averageWaitingTime: 0,
       averageResponseTime: 0,
+      cpuUtilization: 0,
     };
   }
 
@@ -545,18 +550,22 @@ export function calculateMetrics(processes: Process[]): {
   averageTurnaroundTime: number;
   averageWaitingTime: number;
   averageResponseTime: number;
+  cpuUtilization: number;
 } {
   if (processes.length === 0) {
     return {
       averageTurnaroundTime: 0,
       averageWaitingTime: 0,
       averageResponseTime: 0,
+      cpuUtilization: 0,
     };
   }
 
   let totalTurnaroundTime = 0;
   let totalWaitingTime = 0;
   let totalResponseTime = 0;
+  let totalBurstTime = 0; // Total processing time
+  let maxCompletionTime = 0; // Latest completion time (total elapsed time)
 
   for (const process of processes) {
     if (process.turnaroundTime !== undefined) {
@@ -570,11 +579,23 @@ export function calculateMetrics(processes: Process[]): {
     if (process.responseTime !== undefined) {
       totalResponseTime += process.responseTime;
     }
+
+    // Calculate total burst time
+    totalBurstTime += process.burstTime;
+
+    // Track the latest completion time
+    if (process.completionTime !== undefined && process.completionTime > maxCompletionTime) {
+      maxCompletionTime = process.completionTime;
+    }
   }
+
+  // Calculate CPU utilization: (Total Burst Time / Total Elapsed Time) * 100
+  const cpuUtilization = maxCompletionTime > 0 ? (totalBurstTime / maxCompletionTime) * 100 : 0;
 
   return {
     averageTurnaroundTime: totalTurnaroundTime / processes.length,
     averageWaitingTime: totalWaitingTime / processes.length,
     averageResponseTime: totalResponseTime / processes.length,
+    cpuUtilization: cpuUtilization,
   };
 }

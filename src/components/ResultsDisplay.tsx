@@ -6,15 +6,17 @@ import { Process } from "../logic/scheduler";
 interface ResultsDisplayProps {
   averageTurnaroundTime: number;
   averageWaitingTime: number;
-  averageResponseTime: number; // Kept for potential future use or detailed view
+  averageResponseTime: number;
+  cpuUtilization: number;
   processes: Process[];
-  algorithmType: string; // Add algorithm type to know which formula to display
+  algorithmType: string;
 }
 
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   averageTurnaroundTime,
   averageWaitingTime,
-  // averageResponseTime, // No longer displayed directly
+  // averageResponseTime, // Not displayed directly
+  cpuUtilization,
   processes,
   algorithmType,
 }) => {
@@ -36,7 +38,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   );
 
   // Create detailed string showing the calculation for each process
-  // Using process ID (P1, P2, etc.) makes the display more compact and readable
   const waitingTimeTerms = processes.map((p) => {
     const term = isPreemptive
       ? `((${p.completionTime ?? 0}-${p.arrivalTime})-${p.burstTime})`
@@ -44,23 +45,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     return { id: `P${p.id}`, term, value: p.waitingTime ?? 0 };
   });
 
-  // For displaying calculations in step 1 layout with process labels
-  // const waitingTimeFormulaItems = waitingTimeTerms.map((item) =>
-  //   `\\text{${item.id}}: ${item.term}`
-  // ).join(", ");
-
-  // For displaying values in step 2 layout with process labels
-  // const waitingTimeValueItems = waitingTimeTerms.map((item) =>
-  //   `\\text{${item.id}}: ${formatNumber(item.value)}`
-  // ).join(", ");
-
   const waitingFormula = isPreemptive
     ? `\\text{Avg WT} = \\frac{\\sum (\\text{TAT} - \\text{BT})}{\\text{n}}`
     : `\\text{Avg WT} = \\frac{\\sum (\\text{Start Time} - \\text{AT})}{\\text{n}}`;
 
-  // Unused KaTeX strings, removed to fix build errors
-  // const waitingStep1 = `\\text{Avg WT} = \\frac{${waitingTimeFormulaItems}}{${numProcesses}}`;
-  // const waitingStep2 = `\\text{Avg WT} = \\frac{${waitingTimeValueItems}}{${numProcesses}}`;
   const waitingStep3 = `\\text{Avg WT} = \\frac{${formatNumber(totalWaitingTime)}}{${numProcesses}}`;
   const waitingResult = formatNumber(averageWaitingTime);
 
@@ -76,25 +64,21 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     return { id: `P${p.id}`, term, value: p.turnaroundTime ?? 0 };
   });
 
-  // For displaying calculations in step 1 layout with process labels
-  // const tatFormulaItems = tatTerms.map((item) =>
-  //   `\\text{${item.id}}: ${item.term}`
-  // ).join(", ");
-
-  // For displaying values in step 2 layout with process labels
-  // const tatValueItems = tatTerms.map((item) =>
-  //   `\\text{${item.id}}: ${formatNumber(item.value)}`
-  // ).join(", ");
-
   const turnaroundFormula = `\\text{Avg TAT} = \\frac{\\sum (\\text{CT} - \\text{AT})}{\\text{n}}`;
-  // Unused KaTeX strings, removed to fix build errors
-  // const turnaroundStep1 = `\\text{Avg TAT} = \\frac{${tatFormulaItems}}{${numProcesses}}`;
-  // const turnaroundStep2 = `\\text{Avg TAT} = \\frac{${tatValueItems}}{${numProcesses}}`;
   const turnaroundStep3 = `\\text{Avg TAT} = \\frac{${formatNumber(totalTurnaroundTime)}}{${numProcesses}}`;
   const turnaroundResult = formatNumber(averageTurnaroundTime);
 
-  // --- Average Burst Time ---
+  // --- CPU Utilization Calculations ---
   const totalBurstTime = processes.reduce((sum, p) => sum + p.burstTime, 0);
+  const lastCompletionTime = Math.max(
+    ...processes.map((p) => p.completionTime || 0),
+  );
+  
+  const cpuUtilizationFormula = `\\text{CPU Utilization} = \\frac{\\sum \\text{BT}}{\\text{Total Time}} \\times 100`;
+  const cpuUtilizationStep = `\\text{CPU Utilization} = \\frac{${formatNumber(totalBurstTime)}}{${formatNumber(lastCompletionTime)}} \\times 100`;
+  const cpuUtilizationResult = formatNumber(cpuUtilization);
+
+  // --- Average Burst Time ---
   const averageBurstTime = totalBurstTime / numProcesses;
   const avgBurstTimeResult = formatNumber(averageBurstTime);
 
@@ -181,6 +165,24 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <div className="metric-result">
             <p>
               <strong>Result:</strong> {turnaroundResult}
+            </p>
+          </div>
+        </div>
+
+        {/* CPU Utilization Metric */}
+        <div className="metric">
+          <h3>بهره وری CPU (CPU Utilization)</h3>
+          <div className="metric-step-by-step">
+            <p>
+              <strong>Formula:</strong> <InlineMath math={cpuUtilizationFormula} />
+            </p>
+            <p>
+              <strong>Calculation:</strong> <InlineMath math={cpuUtilizationStep} />
+            </p>
+          </div>
+          <div className="metric-result">
+            <p>
+              <strong>Result:</strong> {cpuUtilizationResult}%
             </p>
           </div>
         </div>

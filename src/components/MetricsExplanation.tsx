@@ -50,6 +50,24 @@ const MetricsExplanation: React.FC = () => {
           <em>Example:</em> If arrival=2, first run=4, then RT=2
         </p>
       </div>
+
+      <div className="metric-explanation">
+        <h3>CPU Utilization</h3>
+        <p>Percentage of time the CPU spends doing useful work vs. idle or context switching.</p>
+        <p className="formula">
+          <InlineMath math={"\\text{CPU Utilization} = \\frac{\\sum \\text{BT}}{\\text{Total Time}} \\times 100"} />
+        </p>
+        <p className="explanation">
+          Sum BT = Total time the CPU spent executing all processes<br/>
+          Total Time = Time at which the last process completed
+        </p>
+        <p className="example">
+          <em>Example:</em> If total burst time=22, last completion time=30, then CPU Utilization=73.33%
+        </p>
+        <p className="note">
+          <small>Note: Context switch time reduces CPU utilization by increasing the total time without adding to useful work.</small>
+        </p>
+      </div>
     </div>
   );
 };
