@@ -2,6 +2,11 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Pages](https://img.shields.io/badge/github%20pages-deployed-brightgreen.svg)](https://parsa-mirsaeed.github.io/Scheduling-Algorithms/)
+[![Built with Vite](https://img.shields.io/badge/Built%20with-Vite-blue.svg?style=flat-square&logo=vite)](https://vitejs.dev/)
+[![Built with React](https://img.shields.io/badge/Built%20with-React-61DAFB.svg?style=flat-square&logo=react)](https://reactjs.org/)
+[![Written in TypeScript](https://img.shields.io/badge/Written%20in-TypeScript-3178C6.svg?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Code Style: Prettier](https://img.shields.io/badge/Code%20Style-Prettier-F7B93E.svg?style=flat-square)](https://prettier.io/)
+[![Linting: ESLint](https://img.shields.io/badge/Linting-ESLint-4B32C3.svg?style=flat-square&logo=eslint)](https://eslint.org/)
 
 A React-based web application for visualizing and understanding common CPU scheduling algorithms used in operating systems.
 
