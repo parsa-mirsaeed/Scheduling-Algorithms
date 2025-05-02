@@ -186,6 +186,7 @@ function App() {
                   averageWaitingTime={simulationResults.averageWaitingTime}
                   averageResponseTime={simulationResults.averageResponseTime}
                   processes={simulationResults.processes}
+                  algorithmType={selectedAlgorithm}
                 />
               </div>
 

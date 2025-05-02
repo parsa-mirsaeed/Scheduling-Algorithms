@@ -1143,3 +1143,67 @@ th, td {
   background-color: rgba(63, 81, 181, 0.03);
   border-radius: var(--border-radius-sm);
 }
+
+/* Formula breakdown styles - add these after existing styles */
+.formula-breakdown {
+  margin-bottom: var(--spacing-md);
+  text-align: left;
+  background-color: var(--background);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.formula-breakdown strong {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  color: var(--primary-color);
+}
+
+.formula-terms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
+}
+
+.formula-term {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  background-color: rgba(0, 0, 0, 0.02);
+  margin-bottom: var(--spacing-xs);
+}
+
+.process-id {
+  font-weight: bold;
+  margin-right: var(--spacing-sm);
+  color: var(--secondary-dark);
+  min-width: 35px;
+}
+
+.metric-step-by-step {
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--surface);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 1px 3px var(--card-shadow);
+}
+
+.metric-result {
+  font-weight: bold;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--primary-light);
+  color: var(--text-on-primary);
+  border-radius: var(--border-radius-md);
+  display: inline-block;
+  margin-top: var(--spacing-sm);
+}
+
+/* Media query adjustments for smaller screens */
+@media screen and (max-width: 768px) {
+  .formula-terms {
+    grid-template-columns: 1fr;
+  }
+}

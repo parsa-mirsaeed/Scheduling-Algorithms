@@ -320,7 +320,7 @@ export function srtScheduling(processes: Process[]): SimulationResult {
       currentProcess.turnaroundTime =
         currentProcess.completionTime - currentProcess.arrivalTime;
       currentProcess.waitingTime =
-        currentProcess.startTime - currentProcess.arrivalTime;
+        currentProcess.turnaroundTime - currentProcess.burstTime;
       currentProcess.responseTime =
         currentProcess.startTime - currentProcess.arrivalTime;
     }
@@ -463,7 +463,7 @@ export function rrScheduling(
       currentProcess.turnaroundTime =
         currentProcess.completionTime - currentProcess.arrivalTime;
       currentProcess.waitingTime =
-        currentProcess.startTime - currentProcess.arrivalTime;
+        currentProcess.turnaroundTime - currentProcess.burstTime;
       currentProcess.responseTime =
         currentProcess.startTime - currentProcess.arrivalTime;
     } else {

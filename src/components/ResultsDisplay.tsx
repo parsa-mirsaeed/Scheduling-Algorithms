@@ -8,6 +8,7 @@ interface ResultsDisplayProps {
   averageWaitingTime: number;
   averageResponseTime: number; // Kept for potential future use or detailed view
   processes: Process[];
+  algorithmType: string; // Add algorithm type to know which formula to display
 }
 
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
@@ -15,12 +16,16 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   averageWaitingTime,
   // averageResponseTime, // No longer displayed directly
   processes,
+  algorithmType,
 }) => {
   // Format number to 2 decimal places, or show integer if it's whole
   const formatNumber = (num: number | undefined): string => {
     if (num === undefined) return "N/A";
     return Number.isInteger(num) ? num.toString() : num.toFixed(2);
   };
+
+  // Check if the algorithm is preemptive
+  const isPreemptive = algorithmType === "RR" || algorithmType === "SRT";
 
   const numProcesses = processes.length > 0 ? processes.length : 1;
 
@@ -31,18 +36,30 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   );
   
   // Create detailed string showing the calculation for each process
-  const waitingTimeCalculationsStr = processes
-    .map((p) => `(${p.startTime ?? 0}-${p.arrivalTime})`)
-    .join("+");
+  // Using process ID (P1, P2, etc.) makes the display more compact and readable
+  const waitingTimeTerms = processes.map((p, idx) => {
+    const term = isPreemptive
+      ? `((${p.completionTime ?? 0}-${p.arrivalTime})-${p.burstTime})`
+      : `(${p.startTime ?? 0}-${p.arrivalTime})`;
+    return { id: `P${p.id}`, term, value: p.waitingTime ?? 0 };
+  });
   
-  // Keep the original values string for step 2
-  const waitingTimeValuesStr = processes
-    .map((p) => formatNumber(p.waitingTime))
-    .join(" + ");
+  // For displaying calculations in step 1 layout with process labels
+  const waitingTimeFormulaItems = waitingTimeTerms.map(item => 
+    `\\text{${item.id}}: ${item.term}`
+  ).join(", ");
   
-  const waitingFormula = `\\text{Avg WT} = \\frac{\\sum \\text{WT}}{\\text{n}}`;
-  const waitingStep1 = `\\text{Avg WT} = \\frac{${waitingTimeCalculationsStr}}{${numProcesses}}`;
-  const waitingStep2 = `\\text{Avg WT} = \\frac{${waitingTimeValuesStr}}{${numProcesses}}`;
+  // For displaying values in step 2 layout with process labels
+  const waitingTimeValueItems = waitingTimeTerms.map(item => 
+    `\\text{${item.id}}: ${formatNumber(item.value)}`
+  ).join(", ");
+  
+  const waitingFormula = isPreemptive
+    ? `\\text{Avg WT} = \\frac{\\sum (\\text{TAT} - \\text{BT})}{\\text{n}}`
+    : `\\text{Avg WT} = \\frac{\\sum (\\text{Start Time} - \\text{AT})}{\\text{n}}`;
+  
+  const waitingStep1 = `\\text{Avg WT} = \\frac{${waitingTimeFormulaItems}}{${numProcesses}}`;
+  const waitingStep2 = `\\text{Avg WT} = \\frac{${waitingTimeValueItems}}{${numProcesses}}`;
   const waitingStep3 = `\\text{Avg WT} = \\frac{${formatNumber(totalWaitingTime)}}{${numProcesses}}`;
   const waitingResult = formatNumber(averageWaitingTime);
 
@@ -52,19 +69,25 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     0,
   );
   
-  // Create detailed string showing the calculation for each process
-  const turnaroundTimeCalculationsStr = processes
-    .map((p) => `(${p.completionTime ?? 0}-${p.arrivalTime})`)
-    .join("+");
+  // Create detailed string showing the calculation for each process with process IDs
+  const tatTerms = processes.map((p, idx) => {
+    const term = `(${p.completionTime ?? 0}-${p.arrivalTime})`;
+    return { id: `P${p.id}`, term, value: p.turnaroundTime ?? 0 };
+  });
   
-  // Keep the original values string for step 2
-  const turnaroundTimeValuesStr = processes
-    .map((p) => formatNumber(p.turnaroundTime))
-    .join(" + ");
+  // For displaying calculations in step 1 layout with process labels
+  const tatFormulaItems = tatTerms.map(item => 
+    `\\text{${item.id}}: ${item.term}`
+  ).join(", ");
   
-  const turnaroundFormula = `\\text{Avg TAT} = \\frac{\\sum \\text{TAT}}{\\text{n}}`;
-  const turnaroundStep1 = `\\text{Avg TAT} = \\frac{${turnaroundTimeCalculationsStr}}{${numProcesses}}`;
-  const turnaroundStep2 = `\\text{Avg TAT} = \\frac{${turnaroundTimeValuesStr}}{${numProcesses}}`;
+  // For displaying values in step 2 layout with process labels
+  const tatValueItems = tatTerms.map(item => 
+    `\\text{${item.id}}: ${formatNumber(item.value)}`
+  ).join(", ");
+  
+  const turnaroundFormula = `\\text{Avg TAT} = \\frac{\\sum (\\text{CT} - \\text{AT})}{\\text{n}}`;
+  const turnaroundStep1 = `\\text{Avg TAT} = \\frac{${tatFormulaItems}}{${numProcesses}}`;
+  const turnaroundStep2 = `\\text{Avg TAT} = \\frac{${tatValueItems}}{${numProcesses}}`;
   const turnaroundStep3 = `\\text{Avg TAT} = \\frac{${formatNumber(totalTurnaroundTime)}}{${numProcesses}}`;
   const turnaroundResult = formatNumber(averageTurnaroundTime);
 
@@ -87,12 +110,28 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <p>
               <strong>Formula:</strong> <InlineMath math={waitingFormula} />
             </p>
-            <p>
-              <strong>Step 1:</strong> <InlineMath math={waitingStep1} />
-            </p>
-            <p>
-              <strong>Step 2:</strong> <InlineMath math={waitingStep2} />
-            </p>
+            <div className="formula-breakdown">
+              <strong>Step 1:</strong>
+              <div className="formula-terms">
+                {waitingTimeTerms.map((item, idx) => (
+                  <div key={idx} className="formula-term">
+                    <span className="process-id">{item.id}:</span>
+                    <InlineMath math={item.term} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="formula-breakdown">
+              <strong>Step 2:</strong>
+              <div className="formula-terms">
+                {waitingTimeTerms.map((item, idx) => (
+                  <div key={idx} className="formula-term">
+                    <span className="process-id">{item.id}:</span>
+                    <span>{formatNumber(item.value)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
             <p>
               <strong>Step 3:</strong> <InlineMath math={waitingStep3} />
             </p>
@@ -111,12 +150,28 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <p>
               <strong>Formula:</strong> <InlineMath math={turnaroundFormula} />
             </p>
-            <p>
-              <strong>Step 1:</strong> <InlineMath math={turnaroundStep1} />
-            </p>
-            <p>
-              <strong>Step 2:</strong> <InlineMath math={turnaroundStep2} />
-            </p>
+            <div className="formula-breakdown">
+              <strong>Step 1:</strong>
+              <div className="formula-terms">
+                {tatTerms.map((item, idx) => (
+                  <div key={idx} className="formula-term">
+                    <span className="process-id">{item.id}:</span>
+                    <InlineMath math={item.term} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="formula-breakdown">
+              <strong>Step 2:</strong>
+              <div className="formula-terms">
+                {tatTerms.map((item, idx) => (
+                  <div key={idx} className="formula-term">
+                    <span className="process-id">{item.id}:</span>
+                    <span>{formatNumber(item.value)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
             <p>
               <strong>Step 3:</strong> <InlineMath math={turnaroundStep3} />
             </p>
