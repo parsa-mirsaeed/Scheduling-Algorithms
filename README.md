@@ -102,7 +102,7 @@ This project is released under the MIT License.
 
 ## Contributors
 
-- [Your Name](https://github.com/yourusername)
+- [Parsa MirSaeed ](https://github.com/parsa-mirsaeed)
 
 ---
 

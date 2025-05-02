@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-type Algorithm = 'FIFO' | 'SJF' | 'SRT' | 'RR';
+type Algorithm = "FIFO" | "SJF" | "SRT" | "RR";
 
 interface ControlsProps {
   selectedAlgorithm: Algorithm;
@@ -17,7 +17,7 @@ const Controls: React.FC<ControlsProps> = ({
   timeQuantum,
   setTimeQuantum,
   startSimulation,
-  resetSimulation
+  resetSimulation,
 }) => {
   // Handler for algorithm selection
   const handleAlgorithmChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -28,7 +28,7 @@ const Controls: React.FC<ControlsProps> = ({
   const handleQuantumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const valueAsString = e.target.value;
     // Allow empty string temporarily during typing
-    if (valueAsString === '') {
+    if (valueAsString === "") {
       // Optionally set to a default or handle as needed, here we just return
       // If you want to allow clearing the field, you might need to handle this differently
       // setTimeQuantum(1); // Example: reset to 1 if cleared
@@ -36,7 +36,7 @@ const Controls: React.FC<ControlsProps> = ({
     }
 
     const valueAsNumber = Number(valueAsString);
-    
+
     // Check if it's a valid positive number
     if (!isNaN(valueAsNumber) && valueAsNumber > 0) {
       setTimeQuantum(valueAsNumber);
@@ -60,7 +60,7 @@ const Controls: React.FC<ControlsProps> = ({
       </div>
 
       {/* Show time quantum input only for Round Robin */}
-      {selectedAlgorithm === 'RR' && (
+      {selectedAlgorithm === "RR" && (
         <div className="form-group">
           <label htmlFor="timeQuantum">Time Quantum:</label>
           <input
@@ -95,4 +95,4 @@ const Controls: React.FC<ControlsProps> = ({
   );
 };
 
-export default Controls; 
+export default Controls;

@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { Process, GanttItem } from '../logic/scheduler';
+import React, { useState } from "react";
+import { Process, GanttItem } from "../logic/scheduler";
 
 interface ExecutionHistoryProps {
   processes: Process[];
   ganttChart: GanttItem[];
-  algorithm: 'FIFO' | 'SJF' | 'SRT' | 'RR';
+  algorithm: "FIFO" | "SJF" | "SRT" | "RR";
   timeQuantum?: number;
 }
 
-const ExecutionHistory: React.FC<ExecutionHistoryProps> = ({ 
-  processes, 
-  ganttChart, 
-  algorithm, 
-  timeQuantum 
+const ExecutionHistory: React.FC<ExecutionHistoryProps> = ({
+  processes,
+  ganttChart,
+  algorithm,
+  timeQuantum,
 }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
@@ -21,55 +21,66 @@ const ExecutionHistory: React.FC<ExecutionHistoryProps> = ({
   }
 
   // Create a timeline of process executions
-  const processTimeline = processes.map(process => {
+  const processTimeline = processes.map((process) => {
     // Get all gantt chart entries for this process
-    const executions = ganttChart.filter(item => item.processId === process.id);
-    
+    const executions = ganttChart.filter(
+      (item) => item.processId === process.id,
+    );
+
     // Sort by start time
     executions.sort((a, b) => a.startTime - b.startTime);
-    
+
     // Initial remaining time is the burst time
     let remainingAfterExecution = process.burstTime;
-    
+
     // Calculate execution steps
     const executionSteps = executions.map((execution, index) => {
       const executionTime = execution.endTime - execution.startTime;
       const startingRemaining = remainingAfterExecution;
       remainingAfterExecution -= executionTime;
-      
+
       return {
         stepNumber: index + 1,
         startTime: execution.startTime,
         endTime: execution.endTime,
         executionTime,
         remainingBefore: startingRemaining,
-        remainingAfter: remainingAfterExecution
+        remainingAfter: remainingAfterExecution,
       };
     });
-    
+
     return {
       processId: process.id,
       burstTime: process.burstTime,
-      executionSteps
+      executionSteps,
     };
   });
 
   return (
     <div className="execution-history">
-      <div className="collapsible-header" onClick={() => setIsExpanded(!isExpanded)}>
-        <h3>Execution History {isExpanded ? '▼' : '▶'}</h3>
+      <div
+        className="collapsible-header"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <h3>Execution History {isExpanded ? "▼" : "▶"}</h3>
         <p className="collapsible-description">
-          See how each process was executed over time, including remaining time after each execution
-          {algorithm === 'RR' && timeQuantum && ` (Time Quantum: ${timeQuantum})`}
+          See how each process was executed over time, including remaining time
+          after each execution
+          {algorithm === "RR" &&
+            timeQuantum &&
+            ` (Time Quantum: ${timeQuantum})`}
         </p>
       </div>
-      
+
       {isExpanded && (
         <div className="execution-details">
-          {processTimeline.map(process => (
+          {processTimeline.map((process) => (
             <div key={process.processId} className="process-execution">
-              <h4>Process P{process.processId} (Total Burst Time: {process.burstTime})</h4>
-              
+              <h4>
+                Process P{process.processId} (Total Burst Time:{" "}
+                {process.burstTime})
+              </h4>
+
               {process.executionSteps.length > 0 ? (
                 <table className="execution-table">
                   <thead>
@@ -82,14 +93,20 @@ const ExecutionHistory: React.FC<ExecutionHistoryProps> = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {process.executionSteps.map(step => (
+                    {process.executionSteps.map((step) => (
                       <tr key={step.stepNumber}>
                         <td>{step.stepNumber}</td>
-                        <td>{step.startTime} → {step.endTime}</td>
+                        <td>
+                          {step.startTime} → {step.endTime}
+                        </td>
                         <td>{step.executionTime}</td>
                         <td>{step.remainingBefore}</td>
                         <td>
-                          <span className={step.remainingAfter === 0 ? 'completed' : ''}>
+                          <span
+                            className={
+                              step.remainingAfter === 0 ? "completed" : ""
+                            }
+                          >
                             {step.remainingAfter}
                           </span>
                         </td>
@@ -98,7 +115,9 @@ const ExecutionHistory: React.FC<ExecutionHistoryProps> = ({
                   </tbody>
                 </table>
               ) : (
-                <p className="no-executions">No executions recorded for this process.</p>
+                <p className="no-executions">
+                  No executions recorded for this process.
+                </p>
               )}
             </div>
           ))}
@@ -108,4 +127,4 @@ const ExecutionHistory: React.FC<ExecutionHistoryProps> = ({
   );
 };
 
-export default ExecutionHistory; 
+export default ExecutionHistory;

@@ -1,7 +1,7 @@
-import React from 'react';
-import { InlineMath } from 'react-katex';
-import 'katex/dist/katex.min.css';
-import { Process } from '../logic/scheduler';
+import React from "react";
+import { InlineMath } from "react-katex";
+import "katex/dist/katex.min.css";
+import { Process } from "../logic/scheduler";
 
 interface ResultsDisplayProps {
   averageTurnaroundTime: number;
@@ -14,7 +14,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   averageTurnaroundTime,
   averageWaitingTime,
   averageResponseTime,
-  processes
+  processes,
 }) => {
   // Format number to 2 decimal places
   const formatNumber = (num: number): string => {
@@ -22,12 +22,20 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   };
 
   // Calculate total metrics for formula display
-  const totalTurnaroundTime = processes.reduce((sum, p) => sum + (p.turnaroundTime ?? 0), 0);
-  const totalResponseTime = processes.reduce((sum, p) => sum + (p.responseTime ?? 0), 0);
+  const totalTurnaroundTime = processes.reduce(
+    (sum, p) => sum + (p.turnaroundTime ?? 0),
+    0,
+  );
+  const totalResponseTime = processes.reduce(
+    (sum, p) => sum + (p.responseTime ?? 0),
+    0,
+  );
   const numProcesses = processes.length > 0 ? processes.length : 1;
 
   // Use actual calculated WT values in the sum
-  const waitingSumValuesStr = processes.map(p => formatNumber(p.waitingTime ?? 0)).join('+');
+  const waitingSumValuesStr = processes
+    .map((p) => formatNumber(p.waitingTime ?? 0))
+    .join("+");
 
   // Simplified LaTeX formula strings
   const waitingFormula = `\\text{Avg WT} = \\frac{${waitingSumValuesStr}}{${numProcesses}}`;
@@ -50,9 +58,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
         <div className="metric">
           <h3>Avg. Waiting Time</h3>
-          <div className="metric-value">
-            {formatNumber(averageWaitingTime)}
-          </div>
+          <div className="metric-value">{formatNumber(averageWaitingTime)}</div>
           <div className="metric-formula">
             <InlineMath math={waitingFormula} />
           </div>
@@ -74,4 +80,4 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   );
 };
 
-export default ResultsDisplay; 
+export default ResultsDisplay;

@@ -10,11 +10,11 @@ export interface ProcessPreset {
 
 export const processPresets: ProcessPreset[] = [
   {
-    name: 'Select a Preset...',
-    processes: []
+    name: "Select a Preset...",
+    processes: [],
   },
   {
-    name: 'Basic Sequential (Low Complexity)',
+    name: "Basic Sequential (Low Complexity)",
     processes: [
       { arrivalTime: 0, burstTime: 5 },
       { arrivalTime: 2, burstTime: 3 },
@@ -23,7 +23,7 @@ export const processPresets: ProcessPreset[] = [
     ],
   },
   {
-    name: 'Simultaneous Arrivals (Medium Complexity)',
+    name: "Simultaneous Arrivals (Medium Complexity)",
     processes: [
       { arrivalTime: 0, burstTime: 8 },
       { arrivalTime: 0, burstTime: 4 },
@@ -32,7 +32,7 @@ export const processPresets: ProcessPreset[] = [
     ],
   },
   {
-    name: 'Increasing Bursts (Low Complexity)',
+    name: "Increasing Bursts (Low Complexity)",
     processes: [
       { arrivalTime: 0, burstTime: 2 },
       { arrivalTime: 1, burstTime: 4 },
@@ -41,7 +41,7 @@ export const processPresets: ProcessPreset[] = [
     ],
   },
   {
-    name: 'Decreasing Bursts (High Complexity)',
+    name: "Decreasing Bursts (High Complexity)",
     processes: [
       { arrivalTime: 0, burstTime: 8 },
       { arrivalTime: 2, burstTime: 6 },
@@ -50,7 +50,7 @@ export const processPresets: ProcessPreset[] = [
     ],
   },
   {
-    name: 'Mixed Bursts (High Complexity)',
+    name: "Mixed Bursts (High Complexity)",
     processes: [
       { arrivalTime: 0, burstTime: 7 },
       { arrivalTime: 1, burstTime: 3 }, // Short
@@ -59,16 +59,16 @@ export const processPresets: ProcessPreset[] = [
     ],
   },
   {
-    name: 'SRT Challenge - Preemption (High Complexity)',
+    name: "SRT Challenge - Preemption (High Complexity)",
     processes: [
       { arrivalTime: 0, burstTime: 10 }, // Long job starts
-      { arrivalTime: 1, burstTime: 1 },  // Very short job arrives
+      { arrivalTime: 1, burstTime: 1 }, // Very short job arrives
       { arrivalTime: 3, burstTime: 4 },
       { arrivalTime: 5, burstTime: 3 },
     ],
   },
   {
-    name: 'Round Robin Focus (Medium Complexity)',
+    name: "Round Robin Focus (Medium Complexity)",
     processes: [
       { arrivalTime: 0, burstTime: 5 },
       { arrivalTime: 1, burstTime: 6 },
@@ -76,4 +76,4 @@ export const processPresets: ProcessPreset[] = [
       { arrivalTime: 3, burstTime: 7 }, // Similar lengths, staggered
     ],
   },
-]; 
+];

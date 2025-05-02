@@ -1,11 +1,13 @@
-import React from 'react';
-import { Process } from '../logic/scheduler';
+import React from "react";
+import { Process } from "../logic/scheduler";
 
 interface ProcessListDisplayProps {
   processes: Process[];
 }
 
-const ProcessListDisplay: React.FC<ProcessListDisplayProps> = ({ processes }) => {
+const ProcessListDisplay: React.FC<ProcessListDisplayProps> = ({
+  processes,
+}) => {
   if (processes.length === 0) {
     return <div className="no-processes">No processes added yet.</div>;
   }
@@ -42,4 +44,4 @@ const ProcessListDisplay: React.FC<ProcessListDisplayProps> = ({ processes }) =>
   );
 };
 
-export default ProcessListDisplay; 
+export default ProcessListDisplay;
