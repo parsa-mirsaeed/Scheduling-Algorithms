@@ -1,0 +1,41 @@
+.app-shell {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+  background: var(--g-bg);
+  color: var(--g-text);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  background: var(--g-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.card {
+  background: var(--g-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5);
+  transition: box-shadow 0.2s ease;
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.grid-auto {
+  display: grid;
+  grid-gap: var(--space-5);
+}
+
+@media (min-width: 900px) {
+  .grid-auto-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-auto-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

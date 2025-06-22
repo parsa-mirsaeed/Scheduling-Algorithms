@@ -104,9 +104,11 @@ function App() {
   };
 
   return (
-    <div className="app-container dashboard-layout">
+    <div className="app-shell">
       {/* Navigation Tabs */}
-      <nav className="app-nav">
+      <header className="topbar">
+        <h2>OS Algorithms Visualizer</h2>
+        <nav className="app-nav">
         <button
           className={`nav-button ${mode === "scheduler" ? "active" : ""}`}
           onClick={() => setMode("scheduler")}
@@ -120,6 +122,7 @@ function App() {
           Deadlock Analyzer
         </button>
       </nav>
+      </header>
 
       {mode === "deadlock" ? (
         // Deadlock Analyzer Mode
