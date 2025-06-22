@@ -64,36 +64,39 @@ const ProcessInput: React.FC<ProcessInputProps> = ({ addProcess }) => {
 
   return (
     <div className="process-input">
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="burstTime">Burst Time:</label>
-          <input
-            type="text"
-            id="burstTime"
-            className="form-control"
-            value={burstTime}
-            onChange={handleBurstTimeChange}
-            placeholder="1"
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="arrivalTime">Arrival Time:</label>
-          <input
-            type="text"
-            id="arrivalTime"
-            className="form-control"
-            value={arrivalTime}
-            onChange={handleArrivalTimeChange}
-            placeholder="0"
-            required
-          />
+      <form onSubmit={handleSubmit} className="process-form">
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="burstTime">Burst Time</label>
+            <input
+              type="text"
+              id="burstTime"
+              className="form-control"
+              value={burstTime}
+              onChange={handleBurstTimeChange}
+              placeholder="e.g., 10"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="arrivalTime">Arrival Time</label>
+            <input
+              type="text"
+              id="arrivalTime"
+              className="form-control"
+              value={arrivalTime}
+              onChange={handleArrivalTimeChange}
+              placeholder="e.g., 0"
+              required
+            />
+          </div>
         </div>
 
         {error && <div className="error-message">{error}</div>}
 
-        <button type="submit">Add Process</button>
+        <button type="submit" className="btn btn-primary full-width">
+          Add Process
+        </button>
       </form>
     </div>
   );
