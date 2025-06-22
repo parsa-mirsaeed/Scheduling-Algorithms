@@ -92,6 +92,9 @@ export default function DeadlockAnalyzer() {
         isSafe: boolean;
         safeSequence: number[];
         steps: import("../logic/deadlock").BankersStep[];
+        resourceConditionSatisfied?: boolean;
+        coffmanConditions?: import("../logic/deadlock").CoffmanConditionsResult;
+        resourceGraph?: import("../logic/deadlock").ResourceGraphResult;
       }
     | undefined
   >();
