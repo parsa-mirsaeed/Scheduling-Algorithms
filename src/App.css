@@ -235,6 +235,37 @@ p {
   cursor: not-allowed;
 }
 
+/* Dashboard Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr; /* Fixed-size input column */
+  gap: var(--spacing-xl);
+  align-items: flex-start;
+}
+
+.dashboard-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.input-column {
+  position: sticky; /* Keep it in view while scrolling results */
+  top: var(--spacing-lg);
+  max-height: calc(100vh - 120px); /* Adjust based on header height */
+  overflow-y: auto; /* Allow scrolling only for this column */
+  padding-right: var(--spacing-sm);
+}
+
+.dashboard-card {
+  background-color: var(--surface);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 2px 8px var(--card-shadow);
+  padding: var(--spacing-lg);
+  text-align: left;
+  width: 100%;
+}
+
 /* Setup View */
 .setup-view {
   display: flex;
@@ -430,6 +461,75 @@ label {
   margin-bottom: var(--space-4);
   text-align: center;
   font-size: 0.9rem;
+}
+
+/* Toggle Cards */
+.toggle-card .toggle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: calc(var(--spacing-sm) * -1) 0; /* Counteract card padding for a larger click area */
+  margin-bottom: var(--spacing-sm);
+}
+
+.toggle-card .toggle-header h2 {
+  margin-bottom: 0;
+}
+
+.toggle-card .toggle-icon {
+  font-size: 1.2rem;
+  transition: transform var(--transition-fast);
+}
+
+.toggle-card .toggle-content {
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--g-neutral-200);
+}
+
+/* Process Table */
+.process-table-container {
+  overflow-x: auto;
+}
+
+.process-table {
+  border-collapse: separate;
+  border-spacing: 0 var(--space-2);
+  text-align: center;
+}
+
+.process-table th,
+.process-table td {
+  padding: var(--space-2) var(--space-3);
+  vertical-align: middle;
+}
+
+.process-table .attribute-header {
+  text-align: left;
+  font-weight: 600;
+  color: var(--g-text-secondary);
+  position: sticky;
+  left: 0;
+  background: var(--surface);
+}
+
+.process-table .attribute-name {
+  font-weight: 500;
+  color: var(--g-text-muted);
+  text-align: left;
+  position: sticky;
+  left: 0;
+  background: var(--surface);
+}
+
+.process-table .process-id {
+  display: inline-block;
+  font-weight: 600;
+  color: var(--g-primary);
+  background-color: var(--g-primary-100);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--border-radius-full);
+  min-width: 40px;
 }
 
 /* Tables */
