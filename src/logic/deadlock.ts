@@ -165,7 +165,6 @@ function checkResourceCondition(max: number[][]): boolean {
  */
 function checkCoffmanConditions(max: number[][], allocation: number[][]): CoffmanConditionsResult {
   const nProcesses = max.length;
-  const nResources = max[0]?.length ?? 0;
   
   // 1. Mutual exclusion - Check if resources are being used exclusively
   const mutualExclusion = allocation.some(row => row.some(val => val > 0));

@@ -1,7 +1,205 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { deadlockPresets } from "../data/deadlockPresets";
 import GanttChart from "./GanttChart";
-import { bankersAlgorithm } from "../logic/deadlock";
+import { bankersAlgorithm, ResourceEdge } from "../logic/deadlock";
+import "./DeadlockAnalyzer.css";
+
+/**
+ * Props for the ResourceAllocationGraphSVG component.
+ */
+interface ResourceAllocationGraphSVGProps {
+  edges: ResourceEdge[];
+  nProcesses: number;
+  nResources: number;
+  hasCycle: boolean;
+  cycle: number[];
+}
+
+/**
+ * Component for visualizing a resource allocation graph as an SVG.
+ * Follows IEEE 1016-2009 standard for Software Design Descriptions.
+ */
+function ResourceAllocationGraphSVG({ 
+  edges, 
+  nProcesses, 
+  nResources, 
+  hasCycle, 
+  cycle 
+}: ResourceAllocationGraphSVGProps) {
+  
+  // Calculate node positions in a circular layout
+  const nodePositions = useMemo(() => {
+    const positions: Array<{x: number, y: number}> = [];
+    const radius = 150;
+    const centerX = 200;
+    const centerY = 200;
+    
+    // Position processes on the left half of the circle
+    for (let i = 0; i < nProcesses; i++) {
+      const angle = Math.PI * (0.25 + 1.5 * (i / Math.max(nProcesses, 2)));
+      positions.push({
+        x: centerX + radius * Math.cos(angle),
+        y: centerY + radius * Math.sin(angle)
+      });
+    }
+    
+    // Position resources on the right half of the circle
+    for (let i = 0; i < nResources; i++) {
+      const angle = Math.PI * (0.25 + 1.5 * (i / Math.max(nResources, 2)) + 1);
+      positions.push({
+        x: centerX + radius * Math.cos(angle),
+        y: centerY + radius * Math.sin(angle)
+      });
+    }
+    
+    return positions;
+  }, [nProcesses, nResources]);
+  
+  // Check if an edge is part of the cycle
+  const isInCycle = (from: number, to: number) => {
+    if (!hasCycle || cycle.length < 2) return false;
+    
+    for (let i = 0; i < cycle.length - 1; i++) {
+      if (cycle[i] === from && cycle[i + 1] === to) {
+        return true;
+      }
+    }
+    
+    // Check circular connection (last to first)
+    if (cycle[cycle.length - 1] === from && cycle[0] === to) {
+      return true;
+    }
+    
+    return false;
+  };
+  
+  return (
+    <g>
+      {/* Draw edges first so they appear behind nodes */}
+      {edges.map((edge, index) => {
+        const fromPos = nodePositions[edge.from];
+        const toPos = nodePositions[edge.to];
+        const inCycle = isInCycle(edge.from, edge.to);
+        
+        // Calculate control point for curved edge
+        const midX = (fromPos.x + toPos.x) / 2;
+        const midY = (fromPos.y + toPos.y) / 2;
+        const dx = toPos.x - fromPos.x;
+        const dy = toPos.y - fromPos.y;
+        const normal = { x: -dy, y: dx };
+        const len = Math.sqrt(normal.x * normal.x + normal.y * normal.y);
+        const normalized = { 
+          x: normal.x / len * 20, 
+          y: normal.y / len * 20 
+        };
+        
+        // Different offsets for request vs allocation edges
+        const offset = edge.isProcessToResource ? normalized : { x: -normalized.x, y: -normalized.y };
+        const ctrlX = midX + offset.x;
+        const ctrlY = midY + offset.y;
+        
+        const pathClass = inCycle 
+          ? "cycle-edge" 
+          : edge.isProcessToResource ? "request-edge" : "allocation-edge";
+        
+        const markerEnd = `url(#${pathClass}-arrow)`;
+        
+        return (
+          <path
+            key={`edge-${index}`}
+            d={`M ${fromPos.x} ${fromPos.y} Q ${ctrlX} ${ctrlY} ${toPos.x} ${toPos.y}`}
+            fill="none"
+            className={pathClass}
+            markerEnd={markerEnd}
+          />
+        );
+      })}
+      
+      {/* Define arrow markers for the edges */}
+      <defs>
+        <marker 
+          id="allocation-edge-arrow" 
+          viewBox="0 0 10 10" 
+          refX="9" 
+          refY="5"
+          markerWidth="6" 
+          markerHeight="6" 
+          orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" className="allocation-arrow" />
+        </marker>
+        <marker 
+          id="request-edge-arrow" 
+          viewBox="0 0 10 10" 
+          refX="9" 
+          refY="5"
+          markerWidth="6" 
+          markerHeight="6" 
+          orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" className="request-arrow" />
+        </marker>
+        <marker 
+          id="cycle-edge-arrow" 
+          viewBox="0 0 10 10" 
+          refX="9" 
+          refY="5"
+          markerWidth="6" 
+          markerHeight="6" 
+          orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" className="cycle-arrow" />
+        </marker>
+      </defs>
+      
+      {/* Draw process nodes */}
+      {Array.from({ length: nProcesses }).map((_, i) => {
+        const pos = nodePositions[i];
+        const inCycle = cycle.includes(i);
+        return (
+          <g key={`process-${i}`} className={inCycle ? "node-in-cycle" : ""}>
+            <circle 
+              cx={pos.x} 
+              cy={pos.y} 
+              r={20} 
+              className={`process-node ${inCycle ? 'cycle-node' : ''}`} 
+            />
+            <text 
+              x={pos.x} 
+              y={pos.y} 
+              textAnchor="middle" 
+              dominantBaseline="central"
+              className="node-label">
+              P{i}
+            </text>
+          </g>
+        );
+      })}
+      
+      {/* Draw resource nodes */}
+      {Array.from({ length: nResources }).map((_, i) => {
+        const pos = nodePositions[nProcesses + i];
+        const inCycle = cycle.includes(nProcesses + i);
+        return (
+          <g key={`resource-${i}`} className={inCycle ? "node-in-cycle" : ""}>
+            <rect 
+              x={pos.x - 15} 
+              y={pos.y - 15} 
+              width={30} 
+              height={30} 
+              className={`resource-node ${inCycle ? 'cycle-node' : ''}`} 
+            />
+            <text 
+              x={pos.x} 
+              y={pos.y} 
+              textAnchor="middle" 
+              dominantBaseline="central"
+              className="node-label">
+              R{i}
+            </text>
+          </g>
+        );
+      })}
+    </g>
+  );
+}
 
 interface MatrixInputProps {
   label: string;
@@ -170,16 +368,20 @@ export default function DeadlockAnalyzer() {
     setErrorCells(new Set());
 
     try {
-      const { isSafe, safeSequence, steps } = bankersAlgorithm({
+      // Get all properties from the enhanced bankersAlgorithm
+      const result = bankersAlgorithm({
         max,
         allocation,
         available,
       });
-      setResult({ isSafe, safeSequence, steps });
-      setShowTimeline(isSafe && steps.length > 0);
+      
+      // Store the full result including visualization data
+      setResult(result);
+      console.log("Analysis result:", result); // Debug log
+      setShowTimeline(result.isSafe && result.steps.length > 0);
       resetSteps();
-      if (!isSafe) {
-        const unfinished = max.map((_, idx) => idx).filter((p) => !safeSequence.includes(p));
+      if (!result.isSafe) {
+        const unfinished = max.map((_, idx) => idx).filter((p) => !result.safeSequence.includes(p));
         setUnsafeReason(
           `No safe sequence exists because processes ${unfinished
             .map((p) => `P${p}`)
@@ -326,15 +528,193 @@ export default function DeadlockAnalyzer() {
               />
             </div>
           )}
+          <div className="results">
+            <h3>Analysis Results</h3>
+            <p className={`status-${result.isSafe ? 'safe' : 'unsafe'}`}>
+              <strong>Status: </strong>
+              {result.isSafe
+                ? "Safe state! No deadlock risk with this allocation."
+                : "UNSAFE STATE - potential deadlock risk!"}
+            </p>
 
-          {result.isSafe ? (
-            <>
-              <h3 className="success-text">System is in a SAFE state ✓</h3>
-              <p>
-                Safe sequence:{" "}
-                {result.safeSequence.map((p) => `P${p}`).join(" ➜ ")}
-              </p>
-              {result.steps.length > 0 && (
+            {result.isSafe && (
+              <div className="safe-sequence">
+                <p>
+                  <strong>Safe Sequence: </strong>
+                  {result.safeSequence.map((p) => `P${p}`).join(" → ")}
+                </p>
+              </div>
+            )}
+
+            {!result.isSafe && unsafeReason && (
+              <div className="unsafe-reason">
+                <p>
+                  <strong>Reason: </strong>
+                  {unsafeReason}
+                </p>
+              </div>
+            )}
+            
+            {/* Resource Condition Check */}
+            {result.resourceConditionSatisfied !== undefined && (
+              <div className={`resource-condition ${result.resourceConditionSatisfied ? 'satisfied' : 'unsatisfied'}`}>
+                <h3>Resource Condition Check</h3>
+                <p>
+                  <strong>Formula: </strong>
+                  sum(Request<sub>i</sub>) &lt; m + n
+                </p>
+                <p>
+                  <strong>Status: </strong>
+                  {result.resourceConditionSatisfied 
+                    ? "✅ Satisfied - Deadlock avoidance possible" 
+                    : "❌ Not satisfied - System at risk of deadlock"}
+                </p>
+                <p>
+                  <strong>Explanation: </strong>
+                  {result.resourceConditionSatisfied
+                    ? `The total of all process requests is less than the sum of processes (${max.length}) and resources (${max[0].length}).`
+                    : `The total of all process requests exceeds the sum of processes (${max.length}) and resources (${max[0].length}), increasing deadlock risk.`}
+                </p>
+              </div>
+            )}
+            
+            {/* Coffman Conditions Checklist */}
+            {result.coffmanConditions && (
+              <div className="coffman-conditions">
+                <h3>Coffman Conditions for Deadlock</h3>
+                <p className="info-text">
+                  All four conditions must be present for deadlock to occur. 
+                  These are necessary but not sufficient conditions.
+                </p>
+                <table className="conditions-table">
+                  <thead>
+                    <tr>
+                      <th>Condition</th>
+                      <th>Status</th>
+                      <th>Explanation</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1. Mutual Exclusion</td>
+                      <td className={result.coffmanConditions.mutualExclusion ? "condition-present" : "condition-absent"}>
+                        {result.coffmanConditions.mutualExclusion ? "✅ Present" : "❌ Absent"}
+                      </td>
+                      <td>
+                        {result.coffmanConditions.mutualExclusion
+                          ? "Resources are being used exclusively by processes."
+                          : "No resources are currently allocated exclusively."}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>2. Hold and Wait</td>
+                      <td className={result.coffmanConditions.holdAndWait ? "condition-present" : "condition-absent"}>
+                        {result.coffmanConditions.holdAndWait ? "✅ Present" : "❌ Absent"}
+                      </td>
+                      <td>
+                        {result.coffmanConditions.holdAndWait
+                          ? "Some processes hold resources while waiting for others."
+                          : "No processes are holding resources while waiting for others."}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>3. No Preemption</td>
+                      <td className={result.coffmanConditions.noPreemption ? "condition-present" : "condition-absent"}>
+                        {result.coffmanConditions.noPreemption ? "✅ Present" : "❌ Absent"}
+                      </td>
+                      <td>
+                        {"Resources cannot be forcibly taken from processes (always true in this model)."}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>4. Circular Wait</td>
+                      <td className={result.coffmanConditions.circularWait ? "condition-present" : "condition-absent"}>
+                        {result.coffmanConditions.circularWait ? "✅ Present" : "❌ Absent"}
+                      </td>
+                      <td>
+                        {result.coffmanConditions.circularWait
+                          ? "A circular chain of processes exists, each waiting for resources held by the next."
+                          : "No circular waiting chains detected in the resource allocation graph."}
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colSpan={3} className={result.coffmanConditions.deadlockPossible ? "deadlock-possible" : "deadlock-impossible"}>
+                        <strong>Conclusion: </strong>
+                        {result.coffmanConditions.deadlockPossible
+                          ? "All conditions for deadlock are present. Deadlock is possible."
+                          : "Not all conditions for deadlock are present. Deadlock cannot occur."}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            )}
+            
+            {/* Resource Allocation Graph Visualization */}
+            {result.resourceGraph && (
+              <div className="resource-graph">
+                <h3>Resource Allocation Graph</h3>
+                <div className="graph-visualization">
+                  <svg width="100%" height="400" className="resource-graph-svg">
+                    {/* Render the graph visualization */}
+                    <ResourceAllocationGraphSVG 
+                      edges={result.resourceGraph.edges} 
+                      nProcesses={max.length} 
+                      nResources={max[0].length}
+                      hasCycle={result.resourceGraph.hasCycle}
+                      cycle={result.resourceGraph.cycle || []}
+                    />
+                  </svg>
+                </div>
+                <div className="graph-legend">
+                  <div className="legend-item">
+                    <span className="process-node">●</span> Process
+                  </div>
+                  <div className="legend-item">
+                    <span className="resource-node">■</span> Resource
+                  </div>
+                  <div className="legend-item">
+                    <span className="allocation-edge">→</span> Allocation (Resource → Process)
+                  </div>
+                  <div className="legend-item">
+                    <span className="request-edge">→</span> Request (Process → Resource)
+                  </div>
+                  {result.resourceGraph.hasCycle && (
+                    <div className="legend-item">
+                      <span className="cycle-edge">→</span> Cycle (Potential Deadlock)
+                    </div>
+                  )}
+                </div>
+                <p className="graph-summary">
+                  <strong>Graph Analysis: </strong>
+                  {result.resourceGraph.hasCycle 
+                    ? `Cycle detected involving ${(result.resourceGraph.cycle || []).length} nodes. Potential for deadlock exists.` 
+                    : "No cycles detected in the resource allocation graph. Deadlock cannot occur based on circular wait condition."}
+                </p>
+              </div>
+            )}
+            
+            <div className="step-details">
+              {result.isSafe ? (
+              <>
+                <h3 className="success-text">System is in a SAFE state ✓</h3>
+                <p>
+                  Safe sequence:{" "}
+                  {result.safeSequence.map((p) => `P${p}`).join(" ➜ ")}
+                </p>
+              </>
+              ) : (
+              <>
+                <h3 className="error-text">Deadlock detected – system is UNSAFE ✗</h3>
+                {unsafeReason && <p className="error-text">Reason: {unsafeReason}</p>}
+              </>
+              )}
+            </div>
+          
+            {/* Step-by-step banker's execution details */}
+            {result.steps.length > 0 && (
                 <div className="table-container" style={{ overflowX: "auto" }}>
                   <table className="execution-table">
                     <thead>
@@ -364,13 +744,7 @@ export default function DeadlockAnalyzer() {
                   </table>
                 </div>
               )}
-            </>
-          ) : (
-            <>
-              <h3 className="error-text">Deadlock detected – system is UNSAFE ✗</h3>
-              {unsafeReason && <p className="error-text">Reason: {unsafeReason}</p>}
-            </>
-          )}
+          </div>
         </div>
       )}
     </div>
