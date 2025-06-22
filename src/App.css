@@ -375,6 +375,10 @@ input, select {
   transition: border var(--transition-normal), box-shadow var(--transition-normal);
   background-color: var(--surface);
   color: var(--text-primary);
+  /* Ensure readable text on mobile */
+  -webkit-appearance: none; /* Remove default mobile styling */
+  -moz-appearance: none;
+  appearance: none;
 }
 
 input:focus, select:focus {
@@ -953,16 +957,17 @@ th, td {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
     height: auto;
+    gap: var(--spacing-lg); /* Increased gap for stacking */
   }
 
   .dashboard-column {
     overflow-y: visible;
     padding-right: 0;
   }
-  
+
   .input-column {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjusted minmax for smaller screens */
     gap: var(--spacing-md);
   }
 }
@@ -971,14 +976,55 @@ th, td {
   .input-column {
     display: flex;
     flex-direction: column;
+    gap: var(--spacing-md); /* Ensure gap for stacked cards */
   }
-  
+
   .app-header.compact h1 {
     font-size: 1.5rem;
   }
-  
+
   .app-subtitle {
     font-size: 0.85rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  :root {
+    --spacing-md: 0.75rem;
+    --spacing-lg: 1rem;
+    --spacing-xl: 1.5rem;
+  }
+
+  .app-container {
+    padding: var(--spacing-sm);
+  }
+
+  h1 {
+    font-size: 1.3rem; /* Further decreased for very small screens */
+  }
+
+  h2 {
+    font-size: 1.2rem; /* Further decreased for very small screens */
+  }
+
+  /* Adjust table padding for smaller screens */
+  table {
+    font-size: 0.85rem;
+  }
+
+  th, td {
+    padding: var(--spacing-sm);
+  }
+
+  /* Adjust button padding and font size for smaller screens */
+  .action-button {
+    padding: var(--spacing-sm);
+    font-size: 0.85rem;
+    min-width: auto; /* Allow buttons to shrink */
+  }
+
+  .action-buttons {
+    gap: var(--spacing-sm); /* Adjust gap for smaller buttons */
   }
 }
 
