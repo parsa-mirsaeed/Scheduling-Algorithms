@@ -114,19 +114,15 @@ const Controls: React.FC<ControlsProps> = ({
         </>
       )}
 
-      <div className="button-group">
+      <div className="action-buttons">
         <button
           type="button"
-          className="start-button"
+          className="btn btn-primary"
           onClick={startSimulation}
         >
           Start Simulation
         </button>
-        <button
-          type="button"
-          className="reset-button"
-          onClick={resetSimulation}
-        >
+        <button type="button" className="btn btn-secondary" onClick={resetSimulation}>
           Reset
         </button>
       </div>

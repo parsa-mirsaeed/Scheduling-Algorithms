@@ -235,26 +235,32 @@ p {
   cursor: not-allowed;
 }
 
-/* Dashboard Layout */
+/* === Gemini-Inspired Dashboard Layout === */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 380px 1fr; /* Fixed-size input column */
-  gap: var(--spacing-xl);
-  align-items: flex-start;
-}
-
-.dashboard-column {
-  display: flex;
-  flex-direction: column;
+  grid-template-columns: 370px 1fr; /* Fixed-width left column, flexible right column */
   gap: var(--spacing-lg);
+  height: calc(100vh - 80px); /* Full viewport height minus the header */
 }
 
 .input-column {
-  position: sticky; /* Keep it in view while scrolling results */
-  top: var(--spacing-lg);
-  max-height: calc(100vh - 120px); /* Adjust based on header height */
-  overflow-y: auto; /* Allow scrolling only for this column */
-  padding-right: var(--spacing-sm);
+  position: sticky;
+  top: var(--spacing-md);
+  height: calc(100vh - 120px); /* Constrain height to allow internal scrolling */
+  overflow-y: auto;
+  padding-right: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.results-column {
+  height: 100%; /* Occupy full height of the grid row */
+  overflow-y: auto; /* This is the critical property for enabling scrolling */
+  padding: 0 var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
 }
 
 .dashboard-card {
@@ -430,22 +436,42 @@ label {
 }
 
 
+
 .process-form .form-row {
   display: flex;
   gap: var(--space-4);
   margin-bottom: var(--space-4);
+  align-items: flex-end; /* Aligns the button with the bottom of the inputs */
 }
 
 .process-form .form-group {
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: var(--space-2);
 }
 
 .process-form .form-group label {
   margin-bottom: var(--space-2);
   font-size: 0.9rem;
   color: var(--g-text-muted);
+  text-align: left; /* Ensure labels are left-aligned */
+}
+
+.process-form .form-group input {
+  width: 100%;
+  min-height: 48px; /* Standardized height */
+  padding: 0 var(--space-3);
+}
+
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  white-space: nowrap; /* Prevent text from wrapping to a new line */
+  text-align: center;
+  min-height: 48px; /* Match the input height for vertical rhythm */
+  padding: var(--space-2) var(--space-5);
 }
 
 .btn.full-width {
@@ -461,6 +487,30 @@ label {
   margin-bottom: var(--space-4);
   text-align: center;
   font-size: 0.9rem;
+}
+
+/* Dashboard Placeholder */
+.dashboard-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px; /* Ensure the column doesn't collapse */
+  border: 2px dashed var(--g-neutral-200);
+  border-radius: var(--border-radius-lg);
+  color: var(--g-text-muted);
+  text-align: center;
+  width: 100%;
+}
+
+.placeholder-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.placeholder-content svg {
+  color: var(--g-neutral-300);
 }
 
 /* Toggle Cards */
@@ -718,6 +768,90 @@ tr:nth-child(even) {
 .metric-description {
   font-style: italic;
   color: var(--text-secondary);
+}
+
+/* === Redesigned Process Input Card === */
+.process-input-redesigned {
+  background-color: var(--surface);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
+  transition: all var(--transition-normal);
+}
+
+.process-input-redesigned:focus-within {
+  box-shadow: 0 6px 16px rgba(63, 81, 181, 0.2);
+  border-color: var(--primary-light);
+}
+
+.process-form-redesigned {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.input-group-redesigned {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.form-field-redesigned {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field-redesigned label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.form-control-redesigned {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius-md);
+  font-size: 1rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control-redesigned:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.15);
+}
+
+.add-process-btn-redesigned {
+  background-color: var(--primary-color);
+  color: var(--text-on-primary);
+  border: none;
+  padding: var(--spacing-md);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: background-color var(--transition-normal), transform var(--transition-fast);
+  text-transform: none;
+}
+
+.add-process-btn-redesigned:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.add-process-btn-redesigned:active {
+  transform: translateY(0);
+}
+
+.error-message-redesigned {
+  color: var(--error);
+  font-size: 0.875rem;
+  text-align: center;
+  margin-top: var(--spacing-sm);
+  font-weight: 500;
 }
 
 /* Responsive Styles */

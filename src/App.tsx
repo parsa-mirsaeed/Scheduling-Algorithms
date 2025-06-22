@@ -151,10 +151,7 @@ function App() {
                 />
               </div>
 
-              <div className="dashboard-card">
-                <h2>Add Processes</h2>
-                <ProcessInput addProcess={addProcess} />
-              </div>
+              <ProcessInput addProcess={addProcess} />
 
               <div className="dashboard-card">
                 <h2>Configure Simulation</h2>

@@ -48,55 +48,54 @@ const ProcessInput: React.FC<ProcessInputProps> = ({ addProcess }) => {
   // Handle input change with validation
   const handleArrivalTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Allow empty string or valid non-negative integer
-    if (value === "" || (/^\d+$/.test(value) && parseInt(value, 10) >= 0)) {
+    if (value === "" || /^\d*$/.test(value)) {
       setArrivalTime(value);
     }
   };
 
   const handleBurstTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Allow empty string or valid positive integer
-    if (value === "" || (/^\d+$/.test(value) && parseInt(value, 10) > 0)) {
+    if (value === "" || /^\d*$/.test(value)) {
       setBurstTime(value);
     }
   };
 
   return (
-    <div className="process-input">
-      <form onSubmit={handleSubmit} className="process-form">
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="burstTime">Burst Time</label>
-            <input
-              type="text"
-              id="burstTime"
-              className="form-control"
-              value={burstTime}
-              onChange={handleBurstTimeChange}
-              placeholder="e.g., 10"
-              required
-            />
-          </div>
-          <div className="form-group">
+    <div className="process-input-redesigned">
+      <h2>Add Processes</h2>
+      <form onSubmit={handleSubmit} className="process-form-redesigned">
+        <div className="input-group-redesigned">
+          <div className="form-field-redesigned">
             <label htmlFor="arrivalTime">Arrival Time</label>
             <input
-              type="text"
+              type="number"
               id="arrivalTime"
-              className="form-control"
+              className="form-control-redesigned"
               value={arrivalTime}
               onChange={handleArrivalTimeChange}
               placeholder="e.g., 0"
-              required
+              min="0"
+              step="1"
+            />
+          </div>
+          <div className="form-field-redesigned">
+            <label htmlFor="burstTime">Burst Time</label>
+            <input
+              type="number"
+              id="burstTime"
+              className="form-control-redesigned"
+              value={burstTime}
+              onChange={handleBurstTimeChange}
+              placeholder="e.g., 10"
+              min="1"
+              step="1"
             />
           </div>
         </div>
-
-        {error && <div className="error-message">{error}</div>}
-
-        <button type="submit" className="btn btn-primary full-width">
+        <button type="submit" className="add-process-btn-redesigned">
           Add Process
         </button>
+        {error && <p className="error-message-redesigned">{error}</p>}
       </form>
     </div>
   );
