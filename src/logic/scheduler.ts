@@ -29,6 +29,8 @@ export interface SimulationResult {
   cpuUtilization: number; // Added CPU utilization metric
   cpuEfficiency?: number; // CPU efficiency (processing time / total processing time)
   throughput?: number; // Throughput (number of processes / total time)
+  avgReadyQueueLength?: number; // Average number of processes in ready queue (Little's Law)
+  arrivalRate?: number; // Average arrival rate (omega)
 }
 
 // Deep clone a process array to avoid mutation
@@ -654,6 +656,8 @@ export function calculateMetrics(processes: Process[]): {
   cpuUtilization: number;
   cpuEfficiency?: number; // CPU efficiency (processing time / total processing time)
   throughput?: number; // Throughput (number of processes / total time)
+  avgReadyQueueLength?: number; // Average number of processes in ready queue (Little's Law)
+  arrivalRate?: number; // Average arrival rate (omega)
 } {
   if (processes.length === 0) {
     return {
@@ -663,6 +667,8 @@ export function calculateMetrics(processes: Process[]): {
       cpuUtilization: 0,
       cpuEfficiency: 0,
       throughput: 0,
+      avgReadyQueueLength: 0,
+      arrivalRate: 0,
     };
   }
 
@@ -707,12 +713,26 @@ export function calculateMetrics(processes: Process[]): {
   // Calculate throughput: number of processes / total time
   const throughput = maxCompletionTime > 0 ? processes.length / maxCompletionTime : 0;
 
+  // Calculate average arrival rate (omega) - processes per unit time
+  // We estimate this as number of processes / span of arrival times
+  const minArrivalTime = Math.min(...processes.map(p => p.arrivalTime));
+  const maxArrivalTime = Math.max(...processes.map(p => p.arrivalTime));
+  const arrivalTimeSpan = maxArrivalTime - minArrivalTime || 1; // Prevent division by zero
+  const arrivalRate = processes.length / (arrivalTimeSpan || 1);
+  
+  // Calculate average number of processes in ready queue using Little's Law
+  // n = λ * ω, where λ is average waiting time and ω is average arrival rate
+  const averageWaitingTime = totalWaitingTime / processes.length;
+  const avgReadyQueueLength = averageWaitingTime * arrivalRate;
+
   return {
     averageTurnaroundTime: totalTurnaroundTime / processes.length,
-    averageWaitingTime: totalWaitingTime / processes.length,
+    averageWaitingTime: averageWaitingTime,
     averageResponseTime: totalResponseTime / processes.length,
     cpuUtilization: cpuUtilization,
     cpuEfficiency: cpuEfficiency,
     throughput: throughput,
+    avgReadyQueueLength: avgReadyQueueLength,
+    arrivalRate: arrivalRate,
   };
 }

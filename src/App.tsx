@@ -241,6 +241,10 @@ function App() {
                       cpuUtilization={simulationResults.cpuUtilization}
                       processes={simulationResults.processes}
                       algorithmType={selectedAlgorithm}
+                      cpuEfficiency={simulationResults.cpuEfficiency}
+                      throughput={simulationResults.throughput}
+                      avgReadyQueueLength={simulationResults.avgReadyQueueLength}
+                      arrivalRate={simulationResults.arrivalRate}
                     />
                   </div>
 

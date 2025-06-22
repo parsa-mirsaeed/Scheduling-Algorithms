@@ -10,6 +10,10 @@ interface ResultsDisplayProps {
   cpuUtilization: number;
   processes: Process[];
   algorithmType: string;
+  cpuEfficiency?: number;
+  throughput?: number;
+  avgReadyQueueLength?: number;
+  arrivalRate?: number;
 }
 
 const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
@@ -19,6 +23,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   cpuUtilization,
   processes,
   algorithmType,
+  cpuEfficiency,
+  throughput,
+  avgReadyQueueLength,
+  arrivalRate
 }) => {
   // Format number to 2 decimal places, or show integer if it's whole
   const formatNumber = (num: number | undefined): string => {
@@ -85,6 +93,20 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   // --- Relationship Formula ---
   const relationshipFormula = `\\text{Avg TAT} = \\text{Avg WT} + \\text{Avg BT}`;
   const relationshipCheck = `${turnaroundResult} = ${waitingResult} + ${avgBurstTimeResult}`;
+  
+  // --- CPU Efficiency Calculations ---
+  const cpuEfficiencyFormula = `\\text{راندمان CPU} = \\frac{\\text{زمان پردازش}}{\\text{زمان کل پردازش}}`;
+  const cpuEfficiencyResult = formatNumber(cpuEfficiency || 0);
+  
+  // --- Throughput Calculations ---
+  const throughputFormula = `\\text{توان عملیاتی} = \\frac{\\text{تعداد پردازش ها}}{\\text{زمان کل}}`;
+  const throughputStep = `\\text{توان عملیاتی} = \\frac{${numProcesses}}{${formatNumber(lastCompletionTime)}}`;
+  const throughputResult = formatNumber(throughput || 0);
+  
+  // --- Little's Law Calculations ---
+  const littleLawFormula = `n = \\lambda \\times \\omega`;
+  const littleLawStep = `n = ${formatNumber(averageWaitingTime)} \\times ${formatNumber(arrivalRate || 0)}`;
+  const littleLawResult = formatNumber(avgReadyQueueLength || 0);
 
   return (
     <div className="results-display">
@@ -185,6 +207,72 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <div className="metric-result">
             <p>
               <strong>Result:</strong> {cpuUtilizationResult}%
+            </p>
+          </div>
+        </div>
+
+        {/* CPU Efficiency (Gemini-inspired) */}
+        <div className="metric">
+          <h3>راندمان CPU (CPU Efficiency)</h3>
+          <div className="metric-step-by-step">
+            <p>
+              <strong>Formula:</strong>{" "}
+              <InlineMath math={cpuEfficiencyFormula} />
+            </p>
+            <p>
+              <strong>Calculation:</strong>{" "}
+              <InlineMath math={`\\text{راندمان CPU} = ${cpuEfficiencyResult}`} />
+            </p>
+          </div>
+          <div className="metric-result">
+            <p>
+              <strong>Result:</strong> {cpuEfficiencyResult}
+            </p>
+          </div>
+        </div>
+
+        {/* Throughput (Gemini-inspired) */}
+        <div className="metric">
+          <h3>توان عملیاتی (Throughput)</h3>
+          <div className="metric-step-by-step">
+            <p>
+              <strong>Formula:</strong>{" "}
+              <InlineMath math={throughputFormula} />
+            </p>
+            <p>
+              <strong>Calculation:</strong>{" "}
+              <InlineMath math={throughputStep} />
+            </p>
+          </div>
+          <div className="metric-result">
+            <p>
+              <strong>Result:</strong> {throughputResult} processes/time unit
+            </p>
+          </div>
+        </div>
+        
+        {/* Little's Law / Aging */}
+        <div className="metric">
+          <h3>قانون لیتل - تعداد پردازش‌های صف آماده (Little's Law)</h3>
+          <div className="metric-step-by-step">
+            <p>
+              <strong>Formula:</strong>{" "}
+              <InlineMath math={littleLawFormula} />
+            </p>
+            <p>Where:</p>
+            <ul>
+              <li><InlineMath math={"n"} /> = تعداد متوسط پردازش های صف ready</li>
+              <li><InlineMath math={"\\lambda"} /> = میانگین زمان انتظار = {formatNumber(averageWaitingTime)}</li>
+              <li><InlineMath math={"\\omega"} /> = میانگین نرخ ورود به صف ready = {formatNumber(arrivalRate || 0)}</li>
+            </ul>
+            <p>
+              <strong>Calculation:</strong>{" "}
+              <InlineMath math={littleLawStep} />
+            </p>
+          </div>
+          <div className="metric-result">
+            <p>
+              <strong>Result:</strong> {littleLawResult} processes
             </p>
           </div>
         </div>
