@@ -173,7 +173,7 @@ export default function DeadlockAnalyzer() {
         available,
       });
       setResult({ isSafe, safeSequence, steps });
-      setShowTimeline(true);
+      setShowTimeline(isSafe && steps.length > 0);
       resetSteps();
       if (!isSafe) {
         const unfinished = max.map((_, idx) => idx).filter((p) => !safeSequence.includes(p));
@@ -311,7 +311,7 @@ export default function DeadlockAnalyzer() {
 
       {result && (
         <div className="analysis-result">
-          {showTimeline && result && (
+          {showTimeline && result && result.steps.length > 0 && (
             <div className="dashboard-card full-width">
               <h3>Timeline Visualization</h3>
               <GanttChart
