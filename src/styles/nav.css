@@ -1,0 +1,25 @@
+/* Navigation button styles - Gemini-inspired theme */
+.app-nav {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.nav-button {
+  background: transparent;
+  color: var(--g-text-muted);
+  border: none;
+  padding: var(--space-3) var(--space-4);
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-button:hover {
+  background: var(--g-surface-light);
+  color: var(--g-text);
+}
+
+.nav-button.active {
+  background: var(--g-primary);
+  color: #fff;
+}

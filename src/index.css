@@ -1,5 +1,6 @@
 @import "./styles/tokens.css";
 @import "./styles/layout.css";
+@import "./styles/nav.css";
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
