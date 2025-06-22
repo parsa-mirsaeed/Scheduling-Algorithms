@@ -110,13 +110,13 @@ function App() {
         <h2>OS Algorithms Visualizer</h2>
         <nav className="app-nav">
         <button
-          className={`nav-button ${mode === "scheduler" ? "active" : ""}`}
+          className={`btn ${mode === "scheduler" ? "btn-primary" : "btn-ghost"}`}
           onClick={() => setMode("scheduler")}
         >
           CPU Scheduler
         </button>
         <button
-          className={`nav-button ${mode === "deadlock" ? "active" : ""}`}
+          className={`btn ${mode === "deadlock" ? "btn-primary" : "btn-ghost"}`}
           onClick={() => setMode("deadlock")}
         >
           Deadlock Analyzer
@@ -180,14 +180,14 @@ function App() {
 
                   <div className="action-buttons">
                     <button
-                      className="action-button run-button"
+                      className="btn btn-primary"
                       onClick={startSimulation}
                       disabled={processes.length === 0}
                     >
                       Run Simulation
                     </button>
                     <button
-                      className="action-button reset-button"
+                      className="btn btn-danger"
                       onClick={() => setProcesses([])}
                       disabled={processes.length === 0}
                     >

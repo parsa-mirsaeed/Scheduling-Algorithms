@@ -1,0 +1,67 @@
+/* Gemini-inspired styles for matrix and vector tables */
+
+.matrix-table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: center;
+  background: var(--g-surface-light);
+  border-radius: var(--radius-md);
+  overflow: hidden; /* Ensures border-radius is respected by children */
+}
+
+.matrix-table th,
+.matrix-table td {
+  padding: var(--space-3);
+  border: 1px solid var(--g-surface);
+}
+
+.matrix-table tbody tr:nth-child(even) {
+  background: var(--g-surface);
+}
+
+.matrix-table input {
+  width: 50px;
+  background: transparent;
+  border: none;
+  color: var(--g-text);
+  text-align: center;
+  font-size: 1rem;
+}
+
+.matrix-table input:focus {
+  outline: 2px solid var(--g-primary);
+  border-radius: var(--radius-sm);
+}
+
+.error-cell {
+  outline: 2px solid var(--g-error);
+  border-radius: var(--radius-sm);
+}
+
+/* Styles for the CPU Scheduler's process list */
+.process-table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: left;
+  background: var(--g-surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.process-table th,
+.process-table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--g-surface-light);
+}
+
+.process-table thead {
+  background: var(--g-surface-light);
+  color: var(--g-text-muted);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.process-table tbody tr:last-child td {
+  border-bottom: none;
+}

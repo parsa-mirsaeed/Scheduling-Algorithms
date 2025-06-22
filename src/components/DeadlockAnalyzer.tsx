@@ -216,7 +216,7 @@ export default function DeadlockAnalyzer() {
             onChange={(e) => setNumResources(Number(e.target.value))}
           />
         </label>
-        <button className="action-button" onClick={updateDimensions}>
+        <button className="btn btn-ghost" onClick={updateDimensions}>
           Apply Dimensions
         </button>
       </div>
@@ -273,12 +273,12 @@ export default function DeadlockAnalyzer() {
       />
 
       <div className="action-buttons">
-        <button className="action-button run-button" onClick={analyze}>
+        <button className="btn btn-primary" onClick={analyze}>
           Analyze System
         </button>
         {result && (
           <button
-            className="action-button step-button"
+            className="btn btn-ghost"
             onClick={() => {
               if (stepIndex + 1 < result.steps.length) {
                 setStepIndex(stepIndex + 1);

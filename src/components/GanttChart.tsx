@@ -55,18 +55,12 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
     canvas.style.width = `${rect.width}px`;
     canvas.style.height = `${rect.height}px`;
 
-    // Get design tokens from CSS
+    // Get design tokens from Gemini-inspired palette
     const style = getComputedStyle(document.documentElement);
-    const primaryColor =
-      style.getPropertyValue("--primary-color").trim() || "#3f51b5";
-    const secondaryColor =
-      style.getPropertyValue("--secondary-color").trim() || "#00bcd4";
-    const textPrimary =
-      style.getPropertyValue("--text-primary").trim() || "#212121";
-    const textSecondary =
-      style.getPropertyValue("--text-secondary").trim() || "#757575";
-    const surfaceColor =
-      style.getPropertyValue("--surface").trim() || "#ffffff";
+    const textColor = style.getPropertyValue("--g-text").trim() || "#e4e7ef";
+    const textMutedColor = style.getPropertyValue("--g-text-muted").trim() || "#a1a5b7";
+    const surfaceColor = style.getPropertyValue("--g-bg").trim() || "#0f111a";
+    const gridColor = style.getPropertyValue("--g-surface").trim() || "#161925";
 
     // Get colors for processes
     const colors = getProcessColors();
@@ -77,8 +71,8 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Calculate the total time span
-    const lastEndTime = Math.max(...data.map((item) => item.endTime));
-    const firstStartTime = Math.min(...data.map((item) => item.startTime));
+    const lastEndTime = Math.max(...data.map((item) => item.endTime), 0);
+    const firstStartTime = Math.min(...data.map((item) => item.startTime), 0);
     const timeSpan = lastEndTime - firstStartTime;
 
     // Calculate the width of each time unit
@@ -87,7 +81,7 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
     const yStart = 40;
 
     // Draw background grid for better readability
-    ctx.strokeStyle = "rgba(0,0,0,0.05)";
+    ctx.strokeStyle = gridColor;
     ctx.lineWidth = 1;
 
     // Draw vertical grid lines
@@ -103,7 +97,7 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
     ctx.beginPath();
     ctx.moveTo(40, yStart + barHeight + 20);
     ctx.lineTo(rect.width - 40, yStart + barHeight + 20);
-    ctx.strokeStyle = textPrimary;
+    ctx.strokeStyle = textColor;
     ctx.lineWidth = 2;
     ctx.stroke();
     ctx.lineWidth = 1;
@@ -133,31 +127,31 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
         // Enhanced styling for transition points
         ctx.moveTo(x, yStart + barHeight + 10);
         ctx.lineTo(x, yStart + barHeight + 30);
-        ctx.strokeStyle = primaryColor;
+        ctx.strokeStyle = textColor;
         ctx.lineWidth = 2;
         ctx.stroke();
         ctx.lineWidth = 1;
 
         // Larger, bold font for transition points
         ctx.font = "bold 12px Inter, Roboto, sans-serif";
-        ctx.fillStyle = primaryColor;
+        ctx.fillStyle = textColor;
         ctx.fillText(t.toString(), x, yStart + barHeight + 45);
 
         // Add decorative marker for better visibility
         ctx.beginPath();
         ctx.arc(x, yStart + barHeight + 20, 3, 0, Math.PI * 2);
-        ctx.fillStyle = secondaryColor;
+        ctx.fillStyle = textMutedColor;
         ctx.fill();
       } else {
         // Use shorter lines for regular time points
         ctx.moveTo(x, yStart + barHeight + 15);
         ctx.lineTo(x, yStart + barHeight + 25);
-        ctx.strokeStyle = textSecondary;
+        ctx.strokeStyle = textMutedColor;
         ctx.stroke();
 
         // Smaller font for regular time points
         ctx.font = "10px Inter, Roboto, sans-serif";
-        ctx.fillStyle = textSecondary;
+        ctx.fillStyle = textMutedColor;
         ctx.fillText(t.toString(), x, yStart + barHeight + 40);
       }
     }
@@ -170,7 +164,7 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
     ctx.textAlign = "right";
     ctx.font = "bold 12px Inter, Roboto, sans-serif";
     uniqueProcessIds.forEach((id) => {
-      ctx.fillStyle = textPrimary;
+      ctx.fillStyle = textColor;
       ctx.fillText(`P${id}`, 35, yStart + barHeight / 2);
     });
 
@@ -185,7 +179,7 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
 
       // Handle context switch blocks
       if (item.processId === -1) {
-        barColor = "#bdbdbd"; // A neutral grey color for context switch
+        barColor = "#4a4a4a"; // A neutral grey color for context switch
         label = "CS";
         showDuration = false; // Don't show duration for CS
       } else {
@@ -213,70 +207,34 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
         yStart + barHeight,
       );
       ctx.lineTo(x + radius, yStart + barHeight);
-      ctx.quadraticCurveTo(
-        x,
-        yStart + barHeight,
-        x,
-        yStart + barHeight - radius,
-      );
+      ctx.quadraticCurveTo(x, yStart + barHeight, x, yStart + barHeight - radius);
       ctx.lineTo(x, yStart + radius);
       ctx.quadraticCurveTo(x, yStart, x + radius, yStart);
       ctx.closePath();
       ctx.fill();
 
-      // Draw subtle border
-      ctx.strokeStyle = "rgba(0,0,0,0.1)";
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      // Draw the label text
-      ctx.fillStyle = getContrastColor(barColor); // Pass the determined barColor
+      // Draw text inside the bar
+      ctx.fillStyle = "#ffffff"; // White text for better contrast
+      ctx.font = "bold 12px Inter, Roboto, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.font = "bold 14px Inter, Roboto, sans-serif";
 
-      // Add time duration if wide enough and not a context switch
-      if (width > 50 && showDuration) {
-        ctx.fillText(
-          label, // Use dynamic label
-          x + width / 2,
-          yStart + barHeight / 2 - 8,
-        );
-        ctx.font = "12px Inter, Roboto, sans-serif";
-        ctx.fillText(
-          `${item.endTime - item.startTime}`,
-          x + width / 2,
-          yStart + barHeight / 2 + 12,
-        );
-      } else if (width > 5) {
-        // Only draw label if bar is minimally wide
-        ctx.fillText(
-          label, // Use dynamic label
-          x + width / 2,
-          yStart + barHeight / 2,
-        );
+      const barCenter = x + width / 2;
+
+      // Only draw text if the bar is wide enough
+      if (width > 20) {
+        ctx.fillText(label, barCenter, yStart + barHeight / 2 - 8);
+        if (showDuration) {
+          ctx.font = "10px Inter, Roboto, sans-serif";
+          ctx.fillText(
+            `(${(item.endTime - item.startTime).toFixed(1)})`,
+            barCenter,
+            yStart + barHeight / 2 + 10,
+          );
+        }
       }
     });
   }, [data]);
-
-  // Helper function to determine text color based on background for contrast
-  const getContrastColor = (hexColor: string): string => {
-    // Handle potential undefined or invalid hexColor input gracefully
-    if (!hexColor || !/^#[0-9A-F]{6}$/i.test(hexColor)) {
-      return "#000000"; // Default to black if color is invalid
-    }
-
-    // Extract RGB components
-    const r = parseInt(hexColor.slice(1, 3), 16);
-    const g = parseInt(hexColor.slice(3, 5), 16);
-    const b = parseInt(hexColor.slice(5, 7), 16);
-
-    // Calculate luminance - standard formula for perceived brightness
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-    // Return white for dark backgrounds, black for light backgrounds
-    return luminance > 0.5 ? "#000000" : "#ffffff";
-  };
 
   return (
     <div className="gantt-chart">
