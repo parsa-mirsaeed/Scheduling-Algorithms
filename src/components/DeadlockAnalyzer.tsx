@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { deadlockPresets } from "../data/deadlockPresets";
+import GanttChart from "./GanttChart";
 import { bankersAlgorithm } from "../logic/deadlock";
 
 interface MatrixInputProps {
@@ -102,6 +103,7 @@ export default function DeadlockAnalyzer() {
   // Step-through state
   const [stepIndex, setStepIndex] = useState<number>(-1);
   const resetSteps = () => setStepIndex(-1);
+  const [showTimeline, setShowTimeline] = useState(false);
 
   const handleMatrixChange = (
     setter: React.Dispatch<React.SetStateAction<number[][]>>,
@@ -171,6 +173,7 @@ export default function DeadlockAnalyzer() {
         available,
       });
       setResult({ isSafe, safeSequence, steps });
+      setShowTimeline(true);
       resetSteps();
       if (!isSafe) {
         const unfinished = max.map((_, idx) => idx).filter((p) => !safeSequence.includes(p));
@@ -308,6 +311,19 @@ export default function DeadlockAnalyzer() {
 
       {result && (
         <div className="analysis-result">
+          {showTimeline && result && (
+            <div className="dashboard-card full-width">
+              <h3>Timeline Visualization</h3>
+              <GanttChart
+                data={result.steps.map((s, idx) => ({
+                  processId: s.process,
+                  startTime: idx,
+                  endTime: idx + 1,
+                }))}
+              />
+            </div>
+          )}
+
           {result.isSafe ? (
             <>
               <h3 className="success-text">System is in a SAFE state ✓</h3>
