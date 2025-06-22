@@ -238,16 +238,17 @@ p {
 /* === Gemini-Inspired Dashboard Layout === */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 370px 1fr; /* Fixed-width left column, flexible right column */
+  grid-template-columns: 380px 1fr; /* Consistent fixed-width left column */
   gap: var(--spacing-lg);
-  height: calc(100vh - 80px); /* Full viewport height minus the header */
+  /* Full viewport height minus header. overflow: hidden prevents body scroll */
+  height: calc(100vh - 80px);
+  overflow: hidden;
 }
 
 .input-column {
   position: sticky;
   top: var(--spacing-md);
-  height: calc(100vh - 120px); /* Constrain height to allow internal scrolling */
-  overflow-y: auto;
+  height: fit-content; /* Let the column size to its content */
   padding-right: var(--spacing-md);
   display: flex;
   flex-direction: column;
@@ -255,7 +256,7 @@ p {
 }
 
 .results-column {
-  height: 100%; /* Occupy full height of the grid row */
+  /* height: 100%; - Removed to allow content to define height */
   overflow-y: auto; /* This is the critical property for enabling scrolling */
   padding: 0 var(--spacing-md);
   display: flex;
@@ -478,63 +479,81 @@ label {
   width: 100%;
 }
 
-.error-message {
-  color: var(--g-danger);
-  background-color: rgba(255, 77, 109, 0.1);
-  border: 1px solid var(--g-danger);
-  padding: var(--space-3);
-  border-radius: var(--border-radius-md);
-  margin-bottom: var(--space-4);
-  text-align: center;
-  font-size: 0.9rem;
-}
-
-/* Dashboard Placeholder */
-.dashboard-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 500px; /* Ensure the column doesn't collapse */
-  border: 2px dashed var(--g-neutral-200);
-  border-radius: var(--border-radius-lg);
-  color: var(--g-text-muted);
-  text-align: center;
-  width: 100%;
-}
-
-.placeholder-content {
+/* --- Remake: Results Column Layout --- */
+.results-column-remake {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-5);
+  width: 100%;
+  min-width: 400px; /* Ensure it has a minimum width */
+  height: 100%; /* Fill the available grid cell height */
+  overflow-y: auto; /* Enable scrolling for this column */
+  padding-right: var(--spacing-sm); /* Add some space for the scrollbar */
 }
 
-.placeholder-content svg {
-  color: var(--g-neutral-300);
+.results-content-remake {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
 }
 
-/* Toggle Cards */
-.toggle-card .toggle-header {
+/* --- Remake: Toggleable Card --- */
+.toggle-card-remake {
+  background-color: var(--surface);
+  border: 1px solid var(--g-neutral-100);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  width: 100%;
+  transition: box-shadow var(--transition-normal);
+}
+
+.toggle-card-remake:hover {
+  box-shadow: var(--shadow-2);
+}
+
+.toggle-header-remake {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: var(--space-4) var(--space-5);
   cursor: pointer;
-  padding: calc(var(--spacing-sm) * -1) 0; /* Counteract card padding for a larger click area */
-  margin-bottom: var(--spacing-sm);
+  user-select: none; /* Prevents text selection on click */
+  border-bottom: 1px solid transparent; /* Placeholder for transition */
+  transition: background-color var(--transition-normal), border-color var(--transition-normal);
 }
 
-.toggle-card .toggle-header h2 {
-  margin-bottom: 0;
+.toggle-header-remake:hover {
+  background-color: var(--g-neutral-50);
 }
 
-.toggle-card .toggle-icon {
-  font-size: 1.2rem;
+.toggle-header-remake h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.toggle-icon-remake {
+  font-size: 1rem;
   transition: transform var(--transition-fast);
+  transform-origin: center;
 }
 
-.toggle-card .toggle-content {
-  padding-top: var(--spacing-md);
-  border-top: 1px solid var(--g-neutral-200);
+.toggle-icon-remake.expanded {
+  transform: rotate(90deg);
+}
+
+.toggle-content-remake {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+  padding: 0 var(--space-5);
+}
+
+.toggle-content-remake.expanded {
+  max-height: 1500px; /* Generous height for content */
+  padding: var(--space-5);
+  border-top: 1px solid var(--g-neutral-100);
+  transition: max-height 0.4s ease-in, padding 0.4s ease-in;
 }
 
 /* Process Table */
@@ -992,14 +1011,7 @@ tr:nth-child(even) {
   margin-bottom: 0;
 }
 
-/* Dashboard Grid Layout */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: minmax(250px, 30%) 1fr;
-  gap: var(--spacing-md);
-  height: calc(100vh - 100px);
-  overflow: hidden;
-}
+
 
 .dashboard-column {
   display: flex;
@@ -1398,14 +1410,7 @@ th, td {
   border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
-/* Dashboard Grid Layout */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: minmax(250px, 30%) 1fr;
-  gap: var(--spacing-md);
-  height: calc(100vh - 100px);
-  overflow: hidden;
-}
+
 
 .table-container {
   width: 100%;

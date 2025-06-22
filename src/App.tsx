@@ -205,112 +205,73 @@ function App() {
               </div>
             </div>
 
-            {/* Results Column */}
-            <div className="dashboard-column results-column">
-              {status === "finished" && simulationResults ? (
-                <>
+            {/* --- Results Column --- */}
+            <div className="results-column-remake">
+              {status !== 'finished' || !simulationResults ? (
+                <div className="dashboard-placeholder">
+                  <div className="placeholder-content">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                      <line x1="8" y1="21" x2="16" y2="21"></line>
+                      <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                    <h3>Simulation Results Will Appear Here</h3>
+                    <p>Add processes and run the simulation to see the results</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="results-content-remake">
+                  {/* Gantt Chart */}
                   <div className="dashboard-card full-width">
                     <h2>Gantt Chart</h2>
                     <GanttChart data={simulationResults.ganttChart} />
                   </div>
 
+                  {/* Average Metrics */}
                   <div className="dashboard-card">
                     <h2>Average Metrics</h2>
                     <ResultsDisplay
-                      averageTurnaroundTime={
-                        simulationResults.averageTurnaroundTime
-                      }
+                      averageTurnaroundTime={simulationResults.averageTurnaroundTime}
                       averageWaitingTime={simulationResults.averageWaitingTime}
-                      averageResponseTime={
-                        simulationResults.averageResponseTime
-                      }
+                      averageResponseTime={simulationResults.averageResponseTime}
                       cpuUtilization={simulationResults.cpuUtilization}
                       processes={simulationResults.processes}
                       algorithmType={selectedAlgorithm}
                     />
                   </div>
 
-                  <div className="dashboard-card toggle-card">
-                    <div
-                      className="toggle-header"
-                      onClick={() => toggleSection("detailedMetrics")}
-                    >
+                  {/* Toggle: Process Metrics */}
+                  <div className="toggle-card-remake">
+                    <div className="toggle-header-remake" onClick={() => toggleSection('detailedMetrics')}>
                       <h2>Process Metrics</h2>
-                      <span className="toggle-icon">
-                        {expandedSections.detailedMetrics ? "▼" : "▶"}
-                      </span>
+                      <span className={`toggle-icon-remake ${expandedSections.detailedMetrics ? 'expanded' : ''}`}>▶</span>
                     </div>
-                    {expandedSections.detailedMetrics && (
-                      <div className="toggle-content">
-                        <DetailedProcessInfo
-                          processes={simulationResults.processes}
-                        />
-                      </div>
-                    )}
+                    <div className={`toggle-content-remake ${expandedSections.detailedMetrics ? 'expanded' : ''}`}>
+                      <DetailedProcessInfo processes={simulationResults.processes} />
+                    </div>
                   </div>
 
-                  <div className="dashboard-card toggle-card">
-                    <div
-                      className="toggle-header"
-                      onClick={() => toggleSection("executionHistory")}
-                    >
+                  {/* Toggle: Execution Timeline */}
+                  <div className="toggle-card-remake">
+                    <div className="toggle-header-remake" onClick={() => toggleSection('executionHistory')}>
                       <h2>Execution Timeline</h2>
-                      <span className="toggle-icon">
-                        {expandedSections.executionHistory ? "▼" : "▶"}
-                      </span>
+                      <span className={`toggle-icon-remake ${expandedSections.executionHistory ? 'expanded' : ''}`}>▶</span>
                     </div>
-                    {expandedSections.executionHistory && (
-                      <div className="toggle-content">
-                        <ExecutionHistory
-                          processes={simulationResults.processes}
-                          ganttChart={simulationResults.rawGanttChart}
-                          algorithm={selectedAlgorithm}
-                          timeQuantum={
-                            selectedAlgorithm === "RR" ? timeQuantum : undefined
-                          }
-                        />
-                      </div>
-                    )}
+                    <div className={`toggle-content-remake ${expandedSections.executionHistory ? 'expanded' : ''}`}>
+                      <ExecutionHistory
+                        processes={simulationResults.processes}
+                        ganttChart={simulationResults.rawGanttChart}
+                        algorithm={selectedAlgorithm}
+                        timeQuantum={selectedAlgorithm === 'RR' ? timeQuantum : undefined}
+                      />
+                    </div>
                   </div>
 
+                  {/* Reset Button */}
                   <div className="dashboard-actions">
-                    <button
-                      className="action-button reset-button"
-                      onClick={resetSimulation}
-                    >
+                    <button className="action-button reset-button" onClick={resetSimulation}>
                       Reset Simulation
                     </button>
-                  </div>
-                </>
-              ) : (
-                <div className="dashboard-placeholder">
-                  <div className="placeholder-content">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="64"
-                      height="64"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect
-                        x="2"
-                        y="3"
-                        width="20"
-                        height="14"
-                        rx="2"
-                        ry="2"
-                      ></rect>
-                      <line x1="8" y1="21" x2="16" y2="21"></line>
-                      <line x1="12" y1="17" x2="12" y2="21"></line>
-                    </svg>
-                    <h3>Simulation Results Will Appear Here</h3>
-                    <p>
-                      Add processes and run the simulation to see the results
-                    </p>
                   </div>
                 </div>
               )}
