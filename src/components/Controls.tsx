@@ -1,6 +1,6 @@
 import React from "react";
 
-type Algorithm = "FIFO" | "SJF" | "SRT" | "RR";
+type Algorithm = "FIFO" | "SJF" | "SRT" | "RR" | "LPT";
 
 interface ControlsProps {
   selectedAlgorithm: Algorithm;
@@ -80,6 +80,7 @@ const Controls: React.FC<ControlsProps> = ({
           <option value="SJF">Shortest Job First (SJF)</option>
           <option value="SRT">Shortest Remaining Time (SRT)</option>
           <option value="RR">Round Robin (RR)</option>
+          <option value="LPT">Longest Processing Time (LPT)</option>
         </select>
       </div>
 

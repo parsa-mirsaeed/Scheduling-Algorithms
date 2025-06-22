@@ -27,6 +27,8 @@ export interface SimulationResult {
   averageWaitingTime: number;
   averageResponseTime: number;
   cpuUtilization: number; // Added CPU utilization metric
+  cpuEfficiency?: number; // CPU efficiency (processing time / total processing time)
+  throughput?: number; // Throughput (number of processes / total time)
 }
 
 // Deep clone a process array to avoid mutation
@@ -45,6 +47,8 @@ export function fifoScheduling(processes: Process[]): SimulationResult {
       averageWaitingTime: 0,
       averageResponseTime: 0,
       cpuUtilization: 0,
+      cpuEfficiency: 0,
+      throughput: 0,
     };
   }
 
@@ -108,6 +112,8 @@ export function sjfScheduling(processes: Process[]): SimulationResult {
       averageWaitingTime: 0,
       averageResponseTime: 0,
       cpuUtilization: 0,
+      cpuEfficiency: 0,
+      throughput: 0,
     };
   }
 
@@ -207,6 +213,8 @@ export function srtScheduling(processes: Process[]): SimulationResult {
       averageWaitingTime: 0,
       averageResponseTime: 0,
       cpuUtilization: 0,
+      cpuEfficiency: 0,
+      throughput: 0,
     };
   }
 
@@ -373,6 +381,8 @@ export function rrScheduling(
       averageWaitingTime: 0,
       averageResponseTime: 0,
       cpuUtilization: 0,
+      cpuEfficiency: 0,
+      throughput: 0,
     };
   }
 
@@ -512,6 +522,101 @@ export function rrScheduling(
   };
 }
 
+// LPT (Longest Processing Time) algorithm implementation
+export function lptScheduling(processes: Process[]): SimulationResult {
+  if (processes.length === 0) {
+    return {
+      ganttChart: [],
+      rawGanttChart: [],
+      processes: [],
+      averageTurnaroundTime: 0,
+      averageWaitingTime: 0,
+      averageResponseTime: 0,
+      cpuUtilization: 0,
+      cpuEfficiency: 0,
+      throughput: 0,
+    };
+  }
+
+  // Clone processes to avoid mutating the original array
+  const processesClone = cloneProcesses(processes);
+
+  // Sort processes by arrival time first
+  processesClone.sort((a, b) => a.arrivalTime - b.arrivalTime);
+
+  const ganttChart: GanttItem[] = [];
+  const completed: Process[] = [];
+  let currentTime = Math.min(...processesClone.map((p) => p.arrivalTime));
+
+  // Continue until all processes are completed
+  while (completed.length < processesClone.length) {
+    // Find processes that have arrived by the current time
+    const arrivedProcesses = processesClone.filter(
+      (p) =>
+        p.arrivalTime <= currentTime && 
+        !completed.some(cp => cp.id === p.id)
+    );
+
+    if (arrivedProcesses.length === 0) {
+      // No process available at current time, jump to next arrival
+      const nextArrival = processesClone
+        .filter(
+          (p) =>
+            p.arrivalTime > currentTime &&
+            !completed.some(cp => cp.id === p.id)
+        )
+        .sort((a, b) => a.arrivalTime - b.arrivalTime)[0];
+
+      if (nextArrival) {
+        currentTime = nextArrival.arrivalTime;
+        continue;
+      } else {
+        // Should never reach here if implementation is correct
+        break;
+      }
+    }
+
+    // Find the longest job among arrived processes (Gemini-inspired LPT algorithm)
+    const longestJob = arrivedProcesses.sort((a, b) => {
+      return b.burstTime - a.burstTime; // Sort in descending order of burst time
+    })[0];
+
+    // Record start time
+    longestJob.startTime = currentTime;
+
+    // Execute the entire job
+    currentTime += longestJob.burstTime;
+
+    // Mark as completed
+    longestJob.completionTime = currentTime;
+
+    // Calculate metrics
+    longestJob.turnaroundTime = longestJob.completionTime - longestJob.arrivalTime;
+    longestJob.waitingTime = longestJob.startTime - longestJob.arrivalTime;
+    longestJob.responseTime = longestJob.startTime - longestJob.arrivalTime;
+
+    // Add to Gantt chart
+    ganttChart.push({
+      processId: longestJob.id,
+      startTime: longestJob.startTime,
+      endTime: longestJob.completionTime,
+    });
+
+    // Mark as completed
+    completed.push(longestJob);
+  }
+
+  // For non-preemptive, raw is same as consolidated
+  const metrics = calculateMetrics(processesClone);
+
+  return {
+    ganttChart, // Same as rawGanttChart for LPT
+    rawGanttChart: ganttChart,
+    processes: processesClone,
+    ...metrics,
+  };
+}
+
 // Helper function to consolidate Gantt chart entries
 // Merges consecutive blocks of the same process or context switch
 function consolidateGanttChart(rawGantt: GanttItem[]): GanttItem[] {
@@ -547,6 +652,8 @@ export function calculateMetrics(processes: Process[]): {
   averageWaitingTime: number;
   averageResponseTime: number;
   cpuUtilization: number;
+  cpuEfficiency?: number; // CPU efficiency (processing time / total processing time)
+  throughput?: number; // Throughput (number of processes / total time)
 } {
   if (processes.length === 0) {
     return {
@@ -554,6 +661,8 @@ export function calculateMetrics(processes: Process[]): {
       averageWaitingTime: 0,
       averageResponseTime: 0,
       cpuUtilization: 0,
+      cpuEfficiency: 0,
+      throughput: 0,
     };
   }
 
@@ -592,10 +701,18 @@ export function calculateMetrics(processes: Process[]): {
   const cpuUtilization =
     maxCompletionTime > 0 ? (totalBurstTime / maxCompletionTime) * 100 : 0;
 
+  // Calculate CPU efficiency: processing time / total processing time
+  const cpuEfficiency = maxCompletionTime > 0 ? totalBurstTime / maxCompletionTime : 0;
+
+  // Calculate throughput: number of processes / total time
+  const throughput = maxCompletionTime > 0 ? processes.length / maxCompletionTime : 0;
+
   return {
     averageTurnaroundTime: totalTurnaroundTime / processes.length,
     averageWaitingTime: totalWaitingTime / processes.length,
     averageResponseTime: totalResponseTime / processes.length,
     cpuUtilization: cpuUtilization,
+    cpuEfficiency: cpuEfficiency,
+    throughput: throughput,
   };
 }

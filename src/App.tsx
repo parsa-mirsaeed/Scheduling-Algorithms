@@ -17,9 +17,10 @@ import {
   sjfScheduling,
   srtScheduling,
   rrScheduling,
+  lptScheduling,
 } from "./logic/scheduler";
 
-type Algorithm = "FIFO" | "SJF" | "SRT" | "RR";
+type Algorithm = "FIFO" | "SJF" | "SRT" | "RR" | "LPT";
 type AppMode = "scheduler" | "deadlock";
 
 function App() {
@@ -88,6 +89,9 @@ function App() {
         break;
       case "RR":
         result = rrScheduling([...processes], timeQuantum, contextSwitchTime);
+        break;
+      case "LPT":
+        result = lptScheduling([...processes]);
         break;
       default:
         result = fifoScheduling([...processes]);

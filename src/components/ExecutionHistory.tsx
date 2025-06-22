@@ -4,7 +4,7 @@ import { Process, GanttItem } from "../logic/scheduler";
 interface ExecutionHistoryProps {
   processes: Process[];
   ganttChart: GanttItem[];
-  algorithm: "FIFO" | "SJF" | "SRT" | "RR";
+  algorithm: "FIFO" | "SJF" | "SRT" | "RR" | "LPT";
   timeQuantum?: number;
 }
 
