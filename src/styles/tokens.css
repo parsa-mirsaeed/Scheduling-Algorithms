@@ -1,0 +1,42 @@
+:root {
+  /* Gemini-inspired color palette */
+  --g-bg: #0f111a;
+  --g-surface: #161925;
+  --g-surface-light: #1e2130;
+  --g-primary: #4e7bff;
+  --g-primary-light: #7fa3ff;
+  --g-primary-dark: #1d4eff;
+  --g-accent: #9c5cff;
+  --g-error: #ff4d6d;
+  --g-success: #38b48b;
+  --g-text: #e4e7ef;
+  --g-text-muted: #a1a5b7;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Radii */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.12);
+  --shadow-md: 0 4px 8px rgba(0,0,0,.15);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.2);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --g-bg: #ffffff;
+    --g-surface: #f5f7fa;
+    --g-surface-light: #ffffff;
+    --g-text: #1f2329;
+    --g-text-muted: #6b7280;
+  }
+}
