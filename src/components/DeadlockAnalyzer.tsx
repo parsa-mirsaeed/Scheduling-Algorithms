@@ -98,6 +98,7 @@ export default function DeadlockAnalyzer() {
   // Error handling state
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorCells, setErrorCells] = useState<Set<string>>(new Set());
+  const [unsafeReason, setUnsafeReason] = useState<string | null>(null);
   // Step-through state
   const [stepIndex, setStepIndex] = useState<number>(-1);
   const resetSteps = () => setStepIndex(-1);
@@ -171,6 +172,16 @@ export default function DeadlockAnalyzer() {
       });
       setResult({ isSafe, safeSequence, steps });
       resetSteps();
+      if (!isSafe) {
+        const unfinished = max.map((_, idx) => idx).filter((p) => !safeSequence.includes(p));
+        setUnsafeReason(
+          `No safe sequence exists because processes ${unfinished
+            .map((p) => `P${p}`)
+            .join(", ")} cannot obtain their remaining need with current Available.`,
+        );
+      } else {
+        setUnsafeReason(null);
+      }
     } catch (err) {
       setErrorMessage((err as Error).message);
       
@@ -336,7 +347,10 @@ export default function DeadlockAnalyzer() {
               )}
             </>
           ) : (
-            <h3 className="error-text">Deadlock detected – system is UNSAFE ✗</h3>
+            <>
+              <h3 className="error-text">Deadlock detected – system is UNSAFE ✗</h3>
+              {unsafeReason && <p className="error-text">Reason: {unsafeReason}</p>}
+            </>
           )}
         </div>
       )}
