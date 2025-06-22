@@ -15,6 +15,19 @@ export interface BankersInput {
   available: number[];
 }
 
+export interface BankersStep {
+  /** Index of the process that completed in this step */
+  process: number;
+  /** Work vector before the process executed */
+  workBefore: number[];
+  /** Work vector after the process executed (i.e., workBefore + allocation[process]) */
+  workAfter: number[];
+  /** The individual need vector for the process */
+  need: number[];
+  /** Allocation vector for the process */
+  allocation: number[];
+}
+
 export interface BankersResult {
   /** Whether the system is currently in a safe state. */
   isSafe: boolean;
@@ -25,6 +38,8 @@ export interface BankersResult {
   safeSequence: number[];
   /** A copy of the need matrix at the time of evaluation. */
   need: number[][];
+  /** Detailed trace of each successful step. */
+  steps: BankersStep[];
 }
 
 /**
@@ -83,7 +98,7 @@ export function bankersAlgorithm({
     );
   }
   if (max.length === 0) {
-    return { isSafe: true, safeSequence: [], need: [] };
+    return { isSafe: true, safeSequence: [], need: [], steps: [] };
   }
 
   const nProcesses = max.length;
@@ -98,6 +113,7 @@ export function bankersAlgorithm({
   const work = [...available]; // Clone available vector (Work ← Available)
   const finish: boolean[] = Array(nProcesses).fill(false);
   const safeSequence: number[] = [];
+  const steps: BankersStep[] = [];
 
   let madeProgress = true;
   while (safeSequence.length < nProcesses && madeProgress) {
@@ -115,12 +131,22 @@ export function bankersAlgorithm({
         }
 
         if (canProceed) {
+          // Record work vector BEFORE execution for tracing
+          const workBefore = [...work];
           // Pretend process i finishes: Work ← Work + Allocation_i
           for (let j = 0; j < nResources; j++) {
             work[j] += allocation[i][j];
           }
           finish[i] = true;
           safeSequence.push(i);
+          // Push detailed step info
+          steps.push({
+            process: i,
+            workBefore,
+            workAfter: [...work],
+            need: [...need[i]],
+            allocation: [...allocation[i]],
+          });
           madeProgress = true;
         }
       }
@@ -128,5 +154,5 @@ export function bankersAlgorithm({
   }
 
   const isSafe = finish.every((f) => f);
-  return { isSafe, safeSequence, need };
+  return { isSafe, safeSequence, need, steps };
 }

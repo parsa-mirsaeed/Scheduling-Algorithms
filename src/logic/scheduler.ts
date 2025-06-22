@@ -422,87 +422,83 @@ export function rrScheduling(
     }
 
     if (readyQueue.length > 0) {
-        const currentProcess = readyQueue.shift()!; // Get the next process
+      const currentProcess = readyQueue.shift()!; // Get the next process
 
-        // --- Context Switch Handling ---
-        // Apply context switch time only if switching *between different* processes
-        if (lastProcessId !== null && lastProcessId !== currentProcess.id) {
-            const switchStartTime = currentTime;
-            currentTime += contextSwitchTime;
-            rawGanttChart.push({
-                processId: -1, // Use -1 or a specific ID for context switch
-                startTime: switchStartTime,
-                endTime: currentTime,
-            });
-            // Re-check for arrivals during the context switch
-            while (
-                timePointer < processesClone.length &&
-                processesClone[timePointer].arrivalTime <= currentTime
-                ) {
-                readyQueue.push(processesClone[timePointer]);
-                timePointer++;
-            }
-        }
-        // ------------------------------
-
-        const burstStartTime = currentTime;
-
-        // Record start time (first time CPU is allocated)
-        if (currentProcess.startTime === undefined) {
-            currentProcess.startTime = burstStartTime;
-            currentProcess.responseTime = currentProcess.startTime - currentProcess.arrivalTime;
-        }
-
-        // Determine time slice for execution
-        const timeSlice = Math.min(
-            timeQuantum,
-            currentProcess.remainingTime!,
-        );
-
-        // Execute process
-        currentProcess.remainingTime! -= timeSlice;
-        currentTime += timeSlice;
-        lastProcessId = currentProcess.id; // Update last run process ID
-
-        // Add execution block to raw Gantt chart
+      // --- Context Switch Handling ---
+      // Apply context switch time only if switching *between different* processes
+      if (lastProcessId !== null && lastProcessId !== currentProcess.id) {
+        const switchStartTime = currentTime;
+        currentTime += contextSwitchTime;
         rawGanttChart.push({
-            processId: currentProcess.id,
-            startTime: burstStartTime,
-            endTime: currentTime,
+          processId: -1, // Use -1 or a specific ID for context switch
+          startTime: switchStartTime,
+          endTime: currentTime,
         });
-
-        // Add processes that arrived *during* this execution slice
+        // Re-check for arrivals during the context switch
         while (
-            timePointer < processesClone.length &&
-            processesClone[timePointer].arrivalTime <= currentTime
-            ) {
-            readyQueue.push(processesClone[timePointer]);
-            timePointer++;
+          timePointer < processesClone.length &&
+          processesClone[timePointer].arrivalTime <= currentTime
+        ) {
+          readyQueue.push(processesClone[timePointer]);
+          timePointer++;
         }
+      }
+      // ------------------------------
 
-        // Handle process completion or requeue
-        if (currentProcess.remainingTime! <= 0) {
-            currentProcess.completionTime = currentTime;
-            currentProcess.turnaroundTime =
-                currentProcess.completionTime - currentProcess.arrivalTime;
-            currentProcess.waitingTime =
-                currentProcess.turnaroundTime - currentProcess.burstTime;
-            completedCount++;
-            // Process finished, don't add back to queue
-        } else {
-            // Process not finished, add back to the end of the queue
-            readyQueue.push(currentProcess);
-        }
+      const burstStartTime = currentTime;
+
+      // Record start time (first time CPU is allocated)
+      if (currentProcess.startTime === undefined) {
+        currentProcess.startTime = burstStartTime;
+        currentProcess.responseTime =
+          currentProcess.startTime - currentProcess.arrivalTime;
+      }
+
+      // Determine time slice for execution
+      const timeSlice = Math.min(timeQuantum, currentProcess.remainingTime!);
+
+      // Execute process
+      currentProcess.remainingTime! -= timeSlice;
+      currentTime += timeSlice;
+      lastProcessId = currentProcess.id; // Update last run process ID
+
+      // Add execution block to raw Gantt chart
+      rawGanttChart.push({
+        processId: currentProcess.id,
+        startTime: burstStartTime,
+        endTime: currentTime,
+      });
+
+      // Add processes that arrived *during* this execution slice
+      while (
+        timePointer < processesClone.length &&
+        processesClone[timePointer].arrivalTime <= currentTime
+      ) {
+        readyQueue.push(processesClone[timePointer]);
+        timePointer++;
+      }
+
+      // Handle process completion or requeue
+      if (currentProcess.remainingTime! <= 0) {
+        currentProcess.completionTime = currentTime;
+        currentProcess.turnaroundTime =
+          currentProcess.completionTime - currentProcess.arrivalTime;
+        currentProcess.waitingTime =
+          currentProcess.turnaroundTime - currentProcess.burstTime;
+        completedCount++;
+        // Process finished, don't add back to queue
+      } else {
+        // Process not finished, add back to the end of the queue
+        readyQueue.push(currentProcess);
+      }
     } else if (timePointer >= processesClone.length) {
-         // No processes in ready queue and no more arrivals means we are done
-         break;
+      // No processes in ready queue and no more arrivals means we are done
+      break;
     } else {
-        // Should not happen if logic is correct, advance time minimally?
-        // Or handled by the initial check in the loop for empty queue
-        currentTime++; // Minimal advance if stuck? Needs review.
+      // Should not happen if logic is correct, advance time minimally?
+      // Or handled by the initial check in the loop for empty queue
+      currentTime++; // Minimal advance if stuck? Needs review.
     }
-
-
   }
 
   const consolidatedGantt = consolidateGanttChart(rawGanttChart);
@@ -584,13 +580,17 @@ export function calculateMetrics(processes: Process[]): {
     totalBurstTime += process.burstTime;
 
     // Track the latest completion time
-    if (process.completionTime !== undefined && process.completionTime > maxCompletionTime) {
+    if (
+      process.completionTime !== undefined &&
+      process.completionTime > maxCompletionTime
+    ) {
       maxCompletionTime = process.completionTime;
     }
   }
 
   // Calculate CPU utilization: (Total Burst Time / Total Elapsed Time) * 100
-  const cpuUtilization = maxCompletionTime > 0 ? (totalBurstTime / maxCompletionTime) * 100 : 0;
+  const cpuUtilization =
+    maxCompletionTime > 0 ? (totalBurstTime / maxCompletionTime) * 100 : 0;
 
   return {
     averageTurnaroundTime: totalTurnaroundTime / processes.length,

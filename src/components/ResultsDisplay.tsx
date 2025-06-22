@@ -73,7 +73,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const lastCompletionTime = Math.max(
     ...processes.map((p) => p.completionTime || 0),
   );
-  
+
   const cpuUtilizationFormula = `\\text{CPU Utilization} = \\frac{\\sum \\text{BT}}{\\text{Total Time}} \\times 100`;
   const cpuUtilizationStep = `\\text{CPU Utilization} = \\frac{${formatNumber(totalBurstTime)}}{${formatNumber(lastCompletionTime)}} \\times 100`;
   const cpuUtilizationResult = formatNumber(cpuUtilization);
@@ -174,10 +174,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           <h3>بهره وری CPU (CPU Utilization)</h3>
           <div className="metric-step-by-step">
             <p>
-              <strong>Formula:</strong> <InlineMath math={cpuUtilizationFormula} />
+              <strong>Formula:</strong>{" "}
+              <InlineMath math={cpuUtilizationFormula} />
             </p>
             <p>
-              <strong>Calculation:</strong> <InlineMath math={cpuUtilizationStep} />
+              <strong>Calculation:</strong>{" "}
+              <InlineMath math={cpuUtilizationStep} />
             </p>
           </div>
           <div className="metric-result">

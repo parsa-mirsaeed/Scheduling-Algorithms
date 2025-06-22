@@ -14,21 +14,21 @@ const ProcessListDisplay: React.FC<ProcessListDisplayProps> = ({
   const [editedProcesses, setEditedProcesses] = useState<Process[]>(processes);
 
   const handleChange = (
-    processId: number, 
-    field: "burstTime" | "arrivalTime", 
-    value: string
+    processId: number,
+    field: "burstTime" | "arrivalTime",
+    value: string,
   ) => {
     const numericValue = parseInt(value, 10);
-    
+
     if (isNaN(numericValue) || numericValue < 0) return;
-    
-    const newProcesses = editedProcesses.map(process => {
+
+    const newProcesses = editedProcesses.map((process) => {
       if (process.id === processId) {
         return { ...process, [field]: numericValue };
       }
       return process;
     });
-    
+
     setEditedProcesses(newProcesses);
   };
 
@@ -76,7 +76,7 @@ const ProcessListDisplay: React.FC<ProcessListDisplayProps> = ({
                       type="number"
                       min="1"
                       value={process.burstTime}
-                      onChange={(e) => 
+                      onChange={(e) =>
                         handleChange(process.id, "burstTime", e.target.value)
                       }
                       className="process-input"
@@ -96,7 +96,7 @@ const ProcessListDisplay: React.FC<ProcessListDisplayProps> = ({
                       type="number"
                       min="0"
                       value={process.arrivalTime}
-                      onChange={(e) => 
+                      onChange={(e) =>
                         handleChange(process.id, "arrivalTime", e.target.value)
                       }
                       className="process-input"
@@ -110,20 +110,23 @@ const ProcessListDisplay: React.FC<ProcessListDisplayProps> = ({
           </tbody>
         </table>
       </div>
-      
+
       <div className="process-edit-controls">
         {isEditMode ? (
           <>
             <button className="edit-button save-button" onClick={handleSave}>
               Save Changes
             </button>
-            <button className="edit-button cancel-button" onClick={handleCancel}>
+            <button
+              className="edit-button cancel-button"
+              onClick={handleCancel}
+            >
               Cancel
             </button>
           </>
         ) : (
-          <button 
-            className="edit-button" 
+          <button
+            className="edit-button"
             onClick={() => setIsEditMode(true)}
             disabled={!onProcessesUpdate}
           >

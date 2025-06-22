@@ -35,8 +35,11 @@ const MetricsExplanation: React.FC = () => {
         </p>
         <p className="alternative-formula">
           <em>Alternative definition:</em> <InlineMath math={"WT = TAT - BT"} />
-          <br/>
-          <small>(Standard in preemptive algorithms to account for all waiting periods)</small>
+          <br />
+          <small>
+            (Standard in preemptive algorithms to account for all waiting
+            periods)
+          </small>
         </p>
       </div>
 
@@ -53,19 +56,31 @@ const MetricsExplanation: React.FC = () => {
 
       <div className="metric-explanation">
         <h3>CPU Utilization</h3>
-        <p>Percentage of time the CPU spends doing useful work vs. idle or context switching.</p>
+        <p>
+          Percentage of time the CPU spends doing useful work vs. idle or
+          context switching.
+        </p>
         <p className="formula">
-          <InlineMath math={"\\text{CPU Utilization} = \\frac{\\sum \\text{BT}}{\\text{Total Time}} \\times 100"} />
+          <InlineMath
+            math={
+              "\\text{CPU Utilization} = \\frac{\\sum \\text{BT}}{\\text{Total Time}} \\times 100"
+            }
+          />
         </p>
         <p className="explanation">
-          Sum BT = Total time the CPU spent executing all processes<br/>
+          Sum BT = Total time the CPU spent executing all processes
+          <br />
           Total Time = Time at which the last process completed
         </p>
         <p className="example">
-          <em>Example:</em> If total burst time=22, last completion time=30, then CPU Utilization=73.33%
+          <em>Example:</em> If total burst time=22, last completion time=30,
+          then CPU Utilization=73.33%
         </p>
         <p className="note">
-          <small>Note: Context switch time reduces CPU utilization by increasing the total time without adding to useful work.</small>
+          <small>
+            Note: Context switch time reduces CPU utilization by increasing the
+            total time without adding to useful work.
+          </small>
         </p>
       </div>
     </div>

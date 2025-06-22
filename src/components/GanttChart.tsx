@@ -248,7 +248,8 @@ const GanttChart: React.FC<GanttChartProps> = ({ data }) => {
           x + width / 2,
           yStart + barHeight / 2 + 12,
         );
-      } else if (width > 5) { // Only draw label if bar is minimally wide
+      } else if (width > 5) {
+        // Only draw label if bar is minimally wide
         ctx.fillText(
           label, // Use dynamic label
           x + width / 2,
