@@ -2,6 +2,8 @@ import React from "react";
 import { InlineMath } from "react-katex";
 import "katex/dist/katex.min.css";
 import { Process } from "../logic/scheduler";
+import { useLanguage } from "../context/LanguageContext";
+import LanguageToggle from "./LanguageToggle";
 
 interface ResultsDisplayProps {
   averageTurnaroundTime: number;
@@ -28,6 +30,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   avgReadyQueueLength,
   arrivalRate
 }) => {
+  // Get translations from language context
+  const { t } = useLanguage();
+  
   // Format number to 2 decimal places, or show integer if it's whole
   const formatNumber = (num: number | undefined): string => {
     if (num === undefined) return "N/A";
@@ -110,13 +115,14 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   return (
     <div className="results-display">
+      <LanguageToggle className="language-toggle-results" />
       <div className="metrics detailed-calculation">
         {/* Average Waiting Time Metric */}
         <div className="metric">
-          <h3>میانگین زمان انتظار (Avg. WT)</h3>
+          <h3>{t('average_waiting_time')}</h3>
           <div className="metric-step-by-step">
             <p>
-              <strong>Formula:</strong> <InlineMath math={waitingFormula} />
+              <strong>{t('formula')}</strong> <InlineMath math={waitingFormula} />
             </p>
             <div className="formula-breakdown">
               <strong>Step 1:</strong>
@@ -141,22 +147,22 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               </div>
             </div>
             <p>
-              <strong>Step 3:</strong> <InlineMath math={waitingStep3} />
+              <strong>{t('step_3')}</strong> <InlineMath math={waitingStep3} />
             </p>
           </div>
           <div className="metric-result">
             <p>
-              <strong>Result:</strong> {waitingResult}
+              <strong>{t('result')}</strong> {waitingResult}
             </p>
           </div>
         </div>
 
         {/* Average Turnaround Time Metric */}
         <div className="metric">
-          <h3>میانگین زمان پاسخ (Avg. TAT)</h3>
+          <h3>{t('average_turnaround_time')}</h3>
           <div className="metric-step-by-step">
             <p>
-              <strong>Formula:</strong> <InlineMath math={turnaroundFormula} />
+              <strong>{t('formula')}</strong> <InlineMath math={turnaroundFormula} />
             </p>
             <div className="formula-breakdown">
               <strong>Step 1:</strong>
@@ -181,42 +187,42 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               </div>
             </div>
             <p>
-              <strong>Step 3:</strong> <InlineMath math={turnaroundStep3} />
+              <strong>{t('step_3')}</strong> <InlineMath math={turnaroundStep3} />
             </p>
           </div>
           <div className="metric-result">
             <p>
-              <strong>Result:</strong> {turnaroundResult}
+              <strong>{t('result')}</strong> {turnaroundResult}
             </p>
           </div>
         </div>
 
         {/* CPU Utilization Metric */}
         <div className="metric">
-          <h3>بهره وری CPU (CPU Utilization)</h3>
+          <h3>{t('cpu_utilization')}</h3>
           <div className="metric-step-by-step">
             <p>
-              <strong>Formula:</strong>{" "}
+              <strong>{t('formula')}</strong>{" "}
               <InlineMath math={cpuUtilizationFormula} />
             </p>
             <p>
-              <strong>Calculation:</strong>{" "}
+              <strong>{t('calculation')}</strong>{" "}
               <InlineMath math={cpuUtilizationStep} />
             </p>
           </div>
           <div className="metric-result">
             <p>
-              <strong>Result:</strong> {cpuUtilizationResult}%
+              <strong>{t('result')}</strong> {cpuUtilizationResult}%
             </p>
           </div>
         </div>
 
         {/* CPU Efficiency (Gemini-inspired) */}
         <div className="metric">
-          <h3>راندمان CPU (CPU Efficiency)</h3>
+          <h3>{t('cpu_efficiency')}</h3>
           <div className="metric-step-by-step">
             <p>
-              <strong>Formula:</strong>{" "}
+              <strong>{t('formula')}</strong>{" "}
               <InlineMath math={cpuEfficiencyFormula} />
             </p>
             <p>
@@ -226,53 +232,53 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           </div>
           <div className="metric-result">
             <p>
-              <strong>Result:</strong> {cpuEfficiencyResult}
+              <strong>{t('result')}</strong> {cpuEfficiencyResult}
             </p>
           </div>
         </div>
 
         {/* Throughput (Gemini-inspired) */}
         <div className="metric">
-          <h3>توان عملیاتی (Throughput)</h3>
+          <h3>{t('throughput')}</h3>
           <div className="metric-step-by-step">
             <p>
-              <strong>Formula:</strong>{" "}
+              <strong>{t('formula')}</strong>{" "}
               <InlineMath math={throughputFormula} />
             </p>
             <p>
-              <strong>Calculation:</strong>{" "}
+              <strong>{t('calculation')}</strong>{" "}
               <InlineMath math={throughputStep} />
             </p>
           </div>
           <div className="metric-result">
             <p>
-              <strong>Result:</strong> {throughputResult} processes/time unit
+              <strong>{t('result')}</strong> {throughputResult} {t('processes_time_unit')}
             </p>
           </div>
         </div>
         
         {/* Little's Law / Aging */}
         <div className="metric">
-          <h3>قانون لیتل - تعداد پردازش‌های صف آماده (Little's Law)</h3>
+          <h3>{t('little_law')}</h3>
           <div className="metric-step-by-step">
             <p>
-              <strong>Formula:</strong>{" "}
+              <strong>{t('formula')}</strong>{" "}
               <InlineMath math={littleLawFormula} />
             </p>
-            <p>Where:</p>
+            <p>{t('where')}</p>
             <ul>
               <li><InlineMath math={"n"} /> = تعداد متوسط پردازش های صف ready</li>
               <li><InlineMath math={"\\lambda"} /> = میانگین زمان انتظار = {formatNumber(averageWaitingTime)}</li>
               <li><InlineMath math={"\\omega"} /> = میانگین نرخ ورود به صف ready = {formatNumber(arrivalRate || 0)}</li>
             </ul>
             <p>
-              <strong>Calculation:</strong>{" "}
+              <strong>{t('calculation')}</strong>{" "}
               <InlineMath math={littleLawStep} />
             </p>
           </div>
           <div className="metric-result">
             <p>
-              <strong>Result:</strong> {littleLawResult} processes
+              <strong>{t('result')}</strong> {littleLawResult} {t('processes')}
             </p>
           </div>
         </div>
@@ -280,12 +286,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         {/* Average Burst Time & Relationship */}
         <div className="metric-summary">
           <p>
-            <strong>میانگین زمان اجرا (Avg. Burst Time):</strong>{" "}
+            <strong>{t('avg_burst_time')}:</strong>{" "}
             {avgBurstTimeResult}
           </p>
           <div className="metric-relationship">
             <p>
-              <strong>Check:</strong> <InlineMath math={relationshipFormula} />
+              <strong>{t('check')}</strong> <InlineMath math={relationshipFormula} />
             </p>
             <p>
               <InlineMath math={relationshipCheck} />
@@ -293,9 +299,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             {Math.abs(
               averageTurnaroundTime - (averageWaitingTime + averageBurstTime),
             ) < 0.01 ? (
-              <span className="check-ok">✓ Correct</span>
+              <span className="check-ok">{t('correct')}</span>
             ) : (
-              <span className="check-error">✗ Discrepancy</span>
+              <span className="check-error">{t('discrepancy')}</span>
             )}
           </div>
         </div>
