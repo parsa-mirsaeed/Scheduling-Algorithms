@@ -529,14 +529,17 @@ export default function DeadlockAnalyzer() {
             </div>
           )}
           <div className="results">
-            <h3>Analysis Results</h3>
-            <p className={`status-${result.isSafe ? 'safe' : 'unsafe'}`}>
-              <strong>Status: </strong>
-              {result.isSafe
-                ? "Safe state! No deadlock risk with this allocation."
-                : "UNSAFE STATE - potential deadlock risk!"}
+            <h3>Banker's Algorithm Result</h3>
+            <p className={result.isSafe ? "safe-state" : "unsafe-state"}>
+              <strong>System State: </strong> 
+              {result.isSafe ? "Safe" : "Unsafe"}
+              {result.isSafe && result.coffmanConditions?.deadlockPossible && 
+               " (Deadlock possible but avoidable with proper scheduling)"}
             </p>
-
+            <p className="info-text">
+              <strong>Note:</strong> A system can be in a safe state (have a valid execution sequence) 
+              even when deadlock conditions are present. This means deadlock can be avoided with proper scheduling.
+            </p>
             {result.isSafe && (
               <div className="safe-sequence">
                 <p>
@@ -581,10 +584,11 @@ export default function DeadlockAnalyzer() {
             {/* Coffman Conditions Checklist */}
             {result.coffmanConditions && (
               <div className="coffman-conditions">
-                <h3>Coffman Conditions for Deadlock</h3>
+                <h3>Deadlock Possibility Check (Coffman Conditions)</h3>
                 <p className="info-text">
-                  All four conditions must be present for deadlock to occur. 
-                  These are necessary but not sufficient conditions.
+                  All four conditions must be present for deadlock to be <em>possible</em>. 
+                  With multiple instances per resource, these conditions indicate <em>possibility</em> of deadlock, not certainty.
+                  Banker's Algorithm can still find a safe execution sequence even when all conditions are present.
                 </p>
                 <table className="conditions-table">
                   <thead>
@@ -643,7 +647,7 @@ export default function DeadlockAnalyzer() {
                       <td colSpan={3} className={result.coffmanConditions.deadlockPossible ? "deadlock-possible" : "deadlock-impossible"}>
                         <strong>Conclusion: </strong>
                         {result.coffmanConditions.deadlockPossible
-                          ? "All conditions for deadlock are present. Deadlock is possible."
+                          ? `All conditions for deadlock are present. Deadlock is ${result.isSafe ? "possible but avoidable with proper scheduling" : "unavoidable (no safe sequence exists)"}.${ result.isSafe ? " See Banker's safe sequence below." : "" }`
                           : "Not all conditions for deadlock are present. Deadlock cannot occur."}
                       </td>
                     </tr>
@@ -687,10 +691,14 @@ export default function DeadlockAnalyzer() {
                     </div>
                   )}
                 </div>
+                <p className="info-text">
+                  With multiple instances of each resource type, cycles in the graph indicate a <em>potential</em> for deadlock, 
+                  not a guarantee. Banker's Algorithm determines if a safe execution sequence exists despite the presence of cycles.
+                </p>
                 <p className="graph-summary">
                   <strong>Graph Analysis: </strong>
                   {result.resourceGraph.hasCycle 
-                    ? `Cycle detected involving ${(result.resourceGraph.cycle || []).length} nodes. Potential for deadlock exists.` 
+                    ? `Cycle detected involving ${(result.resourceGraph.cycle || []).length} nodes. ${result.isSafe ? "Potential for deadlock exists, but can be avoided with proper process scheduling." : "Deadlock is unavoidable - no safe sequence exists."}` 
                     : "No cycles detected in the resource allocation graph. Deadlock cannot occur based on circular wait condition."}
                 </p>
               </div>
