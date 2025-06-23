@@ -100,12 +100,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   const relationshipCheck = `${turnaroundResult} = ${waitingResult} + ${avgBurstTimeResult}`;
   
   // --- CPU Efficiency Calculations ---
-  const cpuEfficiencyFormula = `\\text{راندمان CPU} = \\frac{\\text{زمان پردازش}}{\\text{زمان کل پردازش}}`;
+  const cpuEfficiencyFormula = `\\text{${t('cpu_efficiency_calc')}} = \\frac{\\text{${t('processing_time')}}}{\\text{${t('total_processing_time')}}}`;
   const cpuEfficiencyResult = formatNumber(cpuEfficiency || 0);
   
   // --- Throughput Calculations ---
-  const throughputFormula = `\\text{توان عملیاتی} = \\frac{\\text{تعداد پردازش ها}}{\\text{زمان کل}}`;
-  const throughputStep = `\\text{توان عملیاتی} = \\frac{${numProcesses}}{${formatNumber(lastCompletionTime)}}`;
+  const throughputFormula = `\\text{${t('throughput')}} = \\frac{\\text{Number of Processes}}{\\text{Total Time}}`;
+  const throughputStep = `\\text{${t('throughput')}} = \\frac{${numProcesses}}{${formatNumber(lastCompletionTime)}}`;
   const throughputResult = formatNumber(throughput || 0);
   
   // --- Little's Law Calculations ---
@@ -226,8 +226,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               <InlineMath math={cpuEfficiencyFormula} />
             </p>
             <p>
-              <strong>Calculation:</strong>{" "}
-              <InlineMath math={`\\text{راندمان CPU} = ${cpuEfficiencyResult}`} />
+              <strong>{t('calculation')}</strong>{" "}
+              <InlineMath math={`\\text{${t('cpu_efficiency_calc')}} = ${cpuEfficiencyResult}`} />
             </p>
           </div>
           <div className="metric-result">
@@ -267,9 +267,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             </p>
             <p>{t('where')}</p>
             <ul>
-              <li><InlineMath math={"n"} /> = تعداد متوسط پردازش های صف ready</li>
-              <li><InlineMath math={"\\lambda"} /> = میانگین زمان انتظار = {formatNumber(averageWaitingTime)}</li>
-              <li><InlineMath math={"\\omega"} /> = میانگین نرخ ورود به صف ready = {formatNumber(arrivalRate || 0)}</li>
+              <li><InlineMath math={"n"} /> = {t('avg_num_processes_ready_queue')}</li>
+              <li><InlineMath math={"\\lambda"} /> = {t('avg_waiting_time_param')} = {formatNumber(averageWaitingTime)}</li>
+              <li><InlineMath math={"\\omega"} /> = {t('avg_arrival_rate_ready_queue')} = {formatNumber(arrivalRate || 0)}</li>
             </ul>
             <p>
               <strong>{t('calculation')}</strong>{" "}
